@@ -1,15 +1,22 @@
-(
-s=Server.local;
-s.options.outDevice_("Fireface UC Mac (23669936)");
-s.quit;
-s.boot;
-)
+// TODO
+// - mockup drum pattern playing a sampler and sending MIDI events
+// - respond to MIDI events instead of OSC messages
 
-ServerOptions.devices
-(
-~selectedSynthIndex = 0;
 
-s.waitForBoot({
+fork{
+
+
+	// MIDI controller callbacks
+	~cueChange = {|num|
+		postf("CUE CHANGE: %\n", num);
+	};
+
+	~subcueChange = {|num|
+		postf("SUBCUE CHANGE: %\n", num);
+	};
+
+
+/*
 	SynthDef.new(\pulse,{
 		// hack from "https://sccode.org/1-Z"
 		// removing layers
@@ -81,20 +88,24 @@ s.waitForBoot({
 			1, {if(msg[1] > 0, {~xxx.set(\f1, 8);
 				~xxx.set(\f2, 3);
 				~xxx.set(\chaos, 1);
-			"DEFAULT".postln;
-		}) },
-		2, {"dosdosdos".postln;});
-	("*Synth " ++ ~selectedSynthIndex ++ ": default " ++ msg[1]).postln;
-}, '/default', n);
+				"DEFAULT".postln;
+			}) },
+			2, {"dosdosdos".postln;});
+		("*Synth " ++ ~selectedSynthIndex ++ ": default " ++ msg[1]).postln;
+	}, '/default', n);
 
 
-OSCdef(\selectPattern).free;
-OSCdef(\selectPattern, {
-	| msg, time, addr, port |
-	~selectedSynthIndex = msg[1];
-	("------------ select pattern " ++ ~selectedSynthIndex ++ "------------").postln;
-}, '/select', n);
+	OSCdef(\selectPattern).free;
+	OSCdef(\selectPattern, {
+		| msg, time, addr, port |
+		~selectedSynthIndex = msg[1];
+		("------------ select pattern " ++ ~selectedSynthIndex ++ "------------").postln;
+	}, '/select', n);
 
-}
-);
-)
+*/
+
+	// manage the MIDI parsing:
+	"parseMIDI.scd".loadRelative(true, {"loaded parse MIDI".postln});
+
+
+};
