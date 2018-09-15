@@ -1,15 +1,13 @@
-// TODO
-// - mockup drum pattern playing a sampler and sending MIDI events
+s.latency = 0.01;
 
-
-fork{
+s.waitForBoot({
 
 	// load synthdefs:
 	"clou_synthDefs.scd".loadRelative(true, {"loaded synthdefs".postln});
 
 	s.sync;
 
-	~debug = true; // post messages
+	~debug = false; // post messages
 	~section = 0;   // song sections
 	~cue = 0;        // parts within sections
 
@@ -25,6 +23,8 @@ fork{
 		~performCue.value(~section, ~cue);
 	};
 
+	~playBass = true;
+	~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
 
 	~initSection = {|section|
 		switch(section,
@@ -32,10 +32,12 @@ fork{
 				if(~debug) {postf("INIT SECTION: %  \n", section)};
 				~xxx.free;
 				~xxx = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1]);
+				~playBass = true;
 			},
 			1, {
 				if(~debug) {postf("INIT SECTION: %  \n", section)};
 				~xxx.free;
+				~playBass = false;
 
 			},
 			2, {
@@ -62,11 +64,18 @@ fork{
 				switch(cue,
 					0, {
 						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-						~xxx.set(\amp, 0.3);
+						~xxx.set(\amp, 0.5);
+						~xxx.set(\f1, 8);
+						~xxx.set(\f2, 3);
+						~xxx.set(\chaos, 1);
+						~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
+
 					},
 					1, {
 						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
 						~xxx.set(\chaos, rrand(0.0, 1));
+						~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0], inf), \octave, Pseq([3, 4], inf) ).asStream;
+
 					},
 					2, {
 						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
@@ -160,11 +169,14 @@ fork{
 		);
 	};
 
-
-
+	~performNote = {|note, vel|
+		if(~debug) {postf("PERFORM NOTE: % - % \n", note, vel)};
+		if(~playBass)
+		{~bass.next(Event.default).play;};
+	};
 
 	// manage the MIDI parsing:
 	"parseMIDI.scd".loadRelative(true, {"loaded parse MIDI".postln});
 
 
-};
+});

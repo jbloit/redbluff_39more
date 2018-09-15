@@ -12,3 +12,14 @@ SynthDef.new(\pulse,{
 	Out.ar(0, (sig1!2)*amp);
 }).add;
 
+
+SynthDef.new(\bass,{
+	|amp=0.1, freq=200, out=0, gate=1|
+	var sig, env;
+	env = Env.asr(0.01, 1, 0.1);
+	sig = Saw.ar(freq);
+	sig = sig * EnvGen.ar(env, gate, amp, doneAction:2);
+	Out.ar(out, sig!2);
+}).add;
+
+

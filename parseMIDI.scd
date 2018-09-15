@@ -26,8 +26,11 @@ MIDIdef.program(\program, {|num, chan|
 
 MIDIdef.noteOn(\noteOn, {
 	|vel, nn, chan |
+	// postf("NOTE ON % % %\n", nn, vel, chan);
 	switch (chan,
-		0, {},
+		0, {
+			~performNote.value(nn, vel);
+		},
 		1, {
 			if (vel > 0)
 			{~cueChange.value(nn)}
