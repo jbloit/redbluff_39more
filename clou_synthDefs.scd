@@ -23,3 +23,13 @@ SynthDef.new(\bass,{
 }).add;
 
 
+SynthDef.new(\mantissa, {|out=0, in=0, amp=0.1, mix=0.5, tone=0.1|
+	var sig, mask, bits;
+	bits = tone.linlin(0, 1, 0, 23);
+	sig = SoundIn.ar(in!2)*amp;
+	mask = MantissaMask.ar(sig, bits);
+	sig = XFade2.ar(sig, mask, mix);
+	Out.ar(out, sig);
+}).add;
+
+x = Synth(\mantissa, [\amp, 0.1, \tone, 1, \mix, 1]);

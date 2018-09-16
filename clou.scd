@@ -1,3 +1,5 @@
+// have an expression midi control, to edit a pbind seq?
+
 s.latency = 0.01;
 
 s.waitForBoot({
