@@ -32,4 +32,4 @@ SynthDef.new(\mantissa, {|out=0, in=0, amp=0.1, mix=0.5, tone=0.1|
 	Out.ar(out, sig);
 }).add;
 
-x = Synth(\mantissa, [\amp, 0.1, \tone, 1, \mix, 1]);
+// x = Synth(\mantissa, [\amp, 0.1, \tone, 1, \mix, 1]);

@@ -1,6 +1,7 @@
 // have an expression midi control, to edit a pbind seq?
 
 s.latency = 0.01;
+// s.reboot;
 
 s.waitForBoot({
 
@@ -9,176 +10,65 @@ s.waitForBoot({
 
 	s.sync;
 
-	~debug = false; // post messages
-	~section = 0;   // song sections
-	~cue = 0;        // parts within sections
+	~debug = true; // post messages
 
-	// MIDI controller callbacks
-	~sectionChange = {|num|
-		// postf("SECTION CHANGE: %\n", num);
-		~section = num;
-		~initSection.value(~section);
-	};
-	~cueChange = {|num|
-		// postf("CUE CHANGE: %\n", num);
-		~cue = num;
-		~performCue.value(~section, ~cue);
-	};
+	// ------------------------------------------------------------ INIT MUSIC STUFF ------------------------------------
 
-	~playBass = true;
-	~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
+	~bassSynth = nil;
 
-	~initSection = {|section|
-		switch(section,
-			0, {
-				if(~debug) {postf("INIT SECTION: %  \n", section)};
-				~xxx.free;
-				~xxx = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1]);
-				~playBass = true;
-			},
-			1, {
-				if(~debug) {postf("INIT SECTION: %  \n", section)};
-				~xxx.free;
-				~playBass = false;
+	// ------------------------------------------------------------- SCORE ----------------------------------------------------
+	~sections = Array.newClear(5);
+	~cues = Array2D.new(5,5);
+	~trigs = Array2D.new(5,5);
 
-			},
-			2, {
-				if(~debug) {postf("INIT SECTION: %  \n", section)};
-				~xxx.free;
+	~currentSection = 0;
+	~currentCue = 0;
 
-			},
-			3, {
-				if(~debug) {postf("INIT SECTION: %  \n", section)};
-				~xxx.free;
-
-			},
-			4, {
-				if(~debug) {postf("INIT SECTION: %  \n", section)};
-				~xxx.free;
-			},
-		);
+	// =====================================================
+	~sections[0] = {
+		if(~debug) {postf("INIT SECTION 0  \n")};
+		~beat.free;
+		~beat = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1]);
+		~playBass = true;
 	};
 
-	~performCue = {|section, cue|
-		// "PERFORM".postln;
-		switch(section,
-			0, {
-				switch(cue,
-					0, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-						~xxx.set(\amp, 0.5);
-						~xxx.set(\f1, 8);
-						~xxx.set(\f2, 3);
-						~xxx.set(\chaos, 1);
-						~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
-
-					},
-					1, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-						~xxx.set(\chaos, rrand(0.0, 1));
-						~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0], inf), \octave, Pseq([3, 4], inf) ).asStream;
-
-					},
-					2, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-						~xxx.set(\f2, rrand(3,24));
-					},
-					3, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-						~xxx.set(\f1, [6,8].choose);
-					},
-					4, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-				);
-			},
-			1, {
-				switch(cue,
-					0, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					1, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					2, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					3, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					4, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-				);
-			},
-			2, {
-				switch(cue,
-					0, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					1, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					2, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					3, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					4, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-				);
-			},
-			3, {
-				switch(cue,
-					0, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					1, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					2, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					3, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					4, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-				);
-			},
-			4, {
-				switch(cue,
-					0, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					1, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					2, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					3, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-					4, {
-						if(~debug) {postf("PERFORM: % - % \n", section, cue)};
-					},
-				);
-			},
-		);
+	// ------------------------------------------------------
+	~cues[0,0] = {
+		if(~debug) {postf("CUE: 0 - 0 \n")};
+		~beat.set(\amp, 0.3);
+		~beat.set(\f1, 8);
+		~beat.set(\f2, 3);
+		~beat.set(\chaos, 1);
+		// ~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
+	};
+	~trigs[0, 0] = {|nn, vel|
+		~bassSynth.free;
+/*		if (nn>0)
+		{*/
+			~bassSynth = Synth(\bass, [\freq, nn.midicps]);
+	// }{};
 	};
 
-	~performNote = {|note, vel|
-		if(~debug) {postf("PERFORM NOTE: % - % \n", note, vel)};
-		if(~playBass)
-		{~bass.next(Event.default).play;};
+	// ------------------------------------------------------
+	~cues[0,1] = {
+		if(~debug) {postf("CUE: 0 - 1 \n")};
+		set(\chaos, rrand(0.0, 1));
 	};
+
+	// ------------------------------------------------------
+	~cues[0,2] = {
+		if(~debug) {postf("CUE: 0 - 2 \n")};
+		set(\f2, rrand(3,24))
+	};
+
+	// ------------------------------------------------------
+	~cues[0,3] = {
+		if(~debug) {postf("CUE: 0 - 3 \n")};
+		set(\f1, [6,8].choose);
+	};
+
 
 	// manage the MIDI parsing:
 	"parseMIDI.scd".loadRelative(true, {"loaded parse MIDI".postln});
-
 
 });

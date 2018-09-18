@@ -17,7 +17,10 @@ MIDIdef.program(\program, {|num, chan|
 		1, {
 			// program changes start at 1 in softstep.
 			if (num > 0)
-			{~sectionChange.value(num - 1)}
+			{
+				~currentSection = num - 1;
+				~sections[~currentSection].value();
+			}
 			{};
 		},
 	);
@@ -29,11 +32,14 @@ MIDIdef.noteOn(\noteOn, {
 	// postf("NOTE ON % % %\n", nn, vel, chan);
 	switch (chan,
 		0, {
-			~performNote.value(nn, vel);
+			~trigs[~currentSection, ~currentCue].value(nn, vel);
 		},
 		1, {
 			if (vel > 0)
-			{~cueChange.value(nn)}
+			{
+				~currentCue = nn;
+				~cues[~currentSection, ~currentCue].value();
+			}
 			{};
 		},
 	);
