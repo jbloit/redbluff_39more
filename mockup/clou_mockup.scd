@@ -24,8 +24,6 @@ SynthDef(\sampler, {
 	Out.ar(out, Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0)));
 }).add;
 
-BfRd
-
 
 // PICK RANDOM SAMPLES
 Buffer.freeAll;

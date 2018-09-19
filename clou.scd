@@ -50,15 +50,19 @@ s.waitForBoot({
 		var pitch, amp;
 		pitch = nn + 40;
 		amp = vel / 127;
-		postf("note pitch % amp % \n", pitch, amp);
 		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
-		// ~bassSynth = Synth(\bass, [\freq, nn.midicps]);
 	};
 
 	// ------------------------------------------------------
 	~cues[0,1] = {
 		if(~debug) {postf("CUE: 0 - 1 \n")};
 		~beat.set(\chaos, rrand(0.0, 1));
+	};
+	~trigs[0, 1] = {|nn, vel|
+		var pitch, amp;
+		pitch = nn + 37;
+		amp = vel / 127;
+		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
 	};
 
 	// ------------------------------------------------------
