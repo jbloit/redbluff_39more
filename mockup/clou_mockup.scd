@@ -1,4 +1,6 @@
 
+// ----------------------------------------- INIT SAMPLER FOR MOCKUP
+(
 Buffer.freeAll;
 ~samplesDir = thisProcess.nowExecutingPath.dirname;
 
@@ -22,6 +24,8 @@ SynthDef(\sampler, {
 	Out.ar(out, Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0)));
 }).add;
 
+BfRd
+
 
 // PICK RANDOM SAMPLES
 Buffer.freeAll;
@@ -38,8 +42,10 @@ Buffer.freeAll;
 	~percBuffers[i].path.postln;
 };
 
-TempoClock.tempo = 0.5;
-//---------------------------------------------------------------------------------------------------------------------
+TempoClock.tempo = 0.4;
+)
+
+//-------------------------------------------- STEP THROUGH SECTIONS & CUES
 
 (
 ~currentSection = 0;
@@ -53,12 +59,13 @@ TempoClock.tempo = 0.5;
 
 
 (
-
-Pdef(\kick, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([1,0,0,1,0,0,1,1,0,0],inf).coin.not, \amp, 0.2, \bufnum, 0, \pan, 0.5)).play(quant:1);
+Pdef(\kick, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([1,0,0,1,0,0,1,1,0,0],inf).coin.not, \amp, 0.2, \bufnum, 0, \pan, 0.5, \synth, Pfunc({arg event; ~trigs[0,0].value(1, event[\isRest].not.asInt / 10)}))).play(quant:1);
 
 Pdef(\snare, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([0,0,1,0,0,1,0,0,1,0],inf).coin.not, \amp, 0.2, \bufnum, 1, \pan, 0.5)).play(quant:1);
 
-Pdef(\tom, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([0,1,0,0,0,0,0,0,0,1],inf).coin.not, \amp, 0.2, \bufnum, 2, \pan, 0.5, \dummy, Pfunc({arg event; ~trigs[0,0].value(event[\isRest].not.asInt*33, 100)}))).play(quant:1);
+// Pdef(\tom, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([0,1,0,0,0,0,0,0,0,1],inf).coin.not, \amp, 0.2, \bufnum, 2, \pan, 0.5)).play(quant:1);
+
+Pdef(\tom, Pbind(\instrument, \sampler, \dur, 1/16,  \isRest,Pseq([0,1,0,0,0,0,0,0,0,1],inf).coin.not, \amp, 0.2, \bufnum, 2, \pan, 0.5, \synth, Pfunc({arg event; ~trigs[0,0].value(4, event[\isRest].not.asInt / 5)}))).play(quant:1);
 
 )
 

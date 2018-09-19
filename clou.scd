@@ -42,11 +42,14 @@ s.waitForBoot({
 		// ~bass = PmonoArtic(\bass, \amp, 0.1, \degree, Pseq([0, 2, 4], inf), \octave, 3, ).asStream;
 	};
 	~trigs[0, 0] = {|nn, vel|
-		~bassSynth.free;
-/*		if (nn>0)
-		{*/
-			~bassSynth = Synth(\bass, [\freq, nn.midicps]);
-	// }{};
+		// nn is instrument coded:
+		// 1: kick
+		// 2: snare
+		// 3: hat
+		// 4: tom
+		var pitch = nn + 40;
+		Synth(\perc, [ \freq, pitch.midicps, \amp, vel]);
+		// ~bassSynth = Synth(\bass, [\freq, nn.midicps]);
 	};
 
 	// ------------------------------------------------------

@@ -33,3 +33,11 @@ SynthDef.new(\mantissa, {|out=0, in=0, amp=0.1, mix=0.5, tone=0.1|
 }).add;
 
 // x = Synth(\mantissa, [\amp, 0.1, \tone, 1, \mix, 1]);
+
+SynthDef(\perc,
+	{
+		|amp=0.1, pan=0, freq=100|
+		var sig;
+		sig = SinOsc.ar(freq:freq, mul: EnvGen.ar(Env.perc(0.001, 0.2), doneAction:2));
+		Out.ar(0, Pan2.ar(sig*amp, pan));
+}).add;
