@@ -55,19 +55,19 @@ s.waitForBoot({
 	// ------------------------------------------------------
 	~cues[0,1] = {
 		if(~debug) {postf("CUE: 0 - 1 \n")};
-		set(\chaos, rrand(0.0, 1));
+		~beat.set(\chaos, rrand(0.0, 1));
 	};
 
 	// ------------------------------------------------------
 	~cues[0,2] = {
 		if(~debug) {postf("CUE: 0 - 2 \n")};
-		set(\f2, rrand(3,24))
+		~beat.set(\f2, rrand(3,24))
 	};
 
 	// ------------------------------------------------------
 	~cues[0,3] = {
 		if(~debug) {postf("CUE: 0 - 3 \n")};
-		set(\f1, [6,8].choose);
+		~beat.set(\f1, [6,8].choose);
 	};
 
 
