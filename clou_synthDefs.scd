@@ -38,6 +38,6 @@ SynthDef(\perc,
 	{
 		|amp=0.1, pan=0, freq=100|
 		var sig;
-		sig = SinOsc.ar(freq:freq, mul: EnvGen.ar(Env.perc(0.001, 0.2), doneAction:2));
+		sig = SinOsc.ar(freq:freq, mul: EnvGen.ar(Env.perc(0.001, 0.3), doneAction:2));
 		Out.ar(0, Pan2.ar(sig*amp, pan));
 }).add;

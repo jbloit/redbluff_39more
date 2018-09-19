@@ -47,8 +47,11 @@ s.waitForBoot({
 		// 2: snare
 		// 3: hat
 		// 4: tom
-		var pitch = nn + 40;
-		Synth(\perc, [ \freq, pitch.midicps, \amp, vel]);
+		var pitch, amp;
+		pitch = nn + 40;
+		amp = vel / 127;
+		postf("note pitch % amp % \n", pitch, amp);
+		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
 		// ~bassSynth = Synth(\bass, [\freq, nn.midicps]);
 	};
 
