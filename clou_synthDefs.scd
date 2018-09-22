@@ -49,9 +49,14 @@ SynthDef(\gain, {
 }).add;
 
 
+
+// OUTPUTS
+~src = Group.new;
+~fx = Group.after(~src); // makes sure it's placed on tail
+
+// EXAMPLE:
 // use the gain synth as a fader stage for a given synth.
-// might not work for one shot perc synths though
-b = Bus.audio(s, 2);
-x = Synth(\pulse, [\amp, 0.2, \out, b]);
-y = Synth.after(x, \gain, [\in, b, \gain, 1]);
-y.set(\gain, 0.9)
+/*b = Bus.audio(s, 1);
+x = Synth(\pulse, [\amp, 0.2, \out, b], ~src);
+y = Synth(\gain, [\in, b, \gain, 1], ~fx);
+y.set(\gain, 0.0)*/
