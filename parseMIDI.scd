@@ -29,7 +29,7 @@ MIDIdef.program(\program, {|num, chan|
 
 MIDIdef.noteOn(\noteOn, {
 	|vel, nn, chan |
-	// postf("NOTE ON % % %\n", nn, vel, chan);
+	postf("NOTE ON % % %\n", nn, vel, chan);
 	switch (chan,
 		0, {
 			~trigs[~currentSection, ~currentCue].value(nn, vel);

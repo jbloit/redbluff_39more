@@ -1,5 +1,4 @@
-// have an expression midi control, to edit a pbind seq?
-
+currentEnvironment.clear;
 s.latency = 0.01;
 // s.reboot;
 
@@ -9,12 +8,23 @@ s.waitForBoot({
 	"clou_synthDefs.scd".loadRelative(true, {"loaded synthdefs".postln});
 
 	s.sync;
-
 	~debug = true; // post messages
+
+	// ------------------------------------------------------------ LEVELS------------------------------------
+	~bBeat = Bus.audio(s, 2);
+	~bBass = Bus.audio(s,2);
+	~bFx = Bus.audio(s, 2);
+
+	~levelBeat = Synth(\gain, [\in, ~bBeat, \gain, 0.5], ~fx);
+	~levelBass = Synth(\gain, [\in, ~bBass, \gain, 0.5], ~fx);
+	~levelFx = Synth(\gain, [\in, ~bFx, \gain, 0.5], ~fx);
+
+	~levelBeat.set(\gain, 0.2);
+	~levelBass.set(\gain, 1);
+	~levelFx.set(\gain, 0);
 
 	// ------------------------------------------------------------ INIT MUSIC STUFF ------------------------------------
 
-	~bassSynth = nil;
 
 	// ------------------------------------------------------------- SCORE ----------------------------------------------------
 	~sections = Array.newClear(5);
@@ -28,7 +38,7 @@ s.waitForBoot({
 	~sections[0] = {
 		if(~debug) {postf("INIT SECTION 0  \n")};
 		~beat.free;
-		~beat = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1]);
+		~beat = Synth(\pulse, [\out, ~bBeat, \amp, 0, \f1, 8, \f2, 3, \chaos, 1], ~src);
 		~playBass = true;
 	};
 
@@ -48,9 +58,11 @@ s.waitForBoot({
 		// 3: hat
 		// 4: tom
 		var pitch, amp;
+
 		pitch = nn + 40;
 		amp = vel / 127;
-		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
+		postf("perc in % % \n", nn, vel);
+		Synth(\perc, [\out, ~bBass,  \freq, pitch.midicps, \amp, amp], ~src);
 	};
 
 	// ------------------------------------------------------
@@ -62,7 +74,7 @@ s.waitForBoot({
 		var pitch, amp;
 		pitch = nn + 37;
 		amp = vel / 127;
-		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
+		Synth(\perc, [\out, ~bBass, \freq, pitch.midicps, \amp, amp], ~src);
 	};
 
 	// ------------------------------------------------------
