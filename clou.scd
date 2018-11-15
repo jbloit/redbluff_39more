@@ -47,22 +47,15 @@ s.waitForBoot({
 		// 2: snare
 		// 3: hat
 		// 4: tom
-		var pitch, amp;
-		pitch = nn + 40;
-		amp = vel / 127;
-		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
+		var pitch = nn + 40;
+		Synth(\perc, [ \freq, pitch.midicps, \amp, vel]);
+		// ~bassSynth = Synth(\bass, [\freq, nn.midicps]);
 	};
 
 	// ------------------------------------------------------
 	~cues[0,1] = {
 		if(~debug) {postf("CUE: 0 - 1 \n")};
 		~beat.set(\chaos, rrand(0.0, 1));
-	};
-	~trigs[0, 1] = {|nn, vel|
-		var pitch, amp;
-		pitch = nn + 37;
-		amp = vel / 127;
-		Synth(\perc, [ \freq, pitch.midicps, \amp, amp]);
 	};
 
 	// ------------------------------------------------------
