@@ -28,14 +28,19 @@ s.waitForBoot({
 	~sections[0] = {
 		if(~debug) {postf("INIT SECTION 0  \n")};
 		~beat.free;
-		~beat = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1]);
+
+		~beat = Synth(\pulse, [\amp, 0, \f1, 8, \f2, 3, \chaos, 1, \fxBus, ~fxBus.index, \fxSend, 1]);
+		~dist = Synth.after(~beat, \sawDist);
+
+		~beat.set(\fxSend, 0.6);
+
 		~playBass = true;
 	};
 
 	// ------------------------------------------------------
 	~cues[0,0] = {
 		if(~debug) {postf("CUE: 0 - 0 \n")};
-		~beat.set(\amp, 0.3);
+		~beat.set(\amp, 0.8);
 		~beat.set(\f1, 8);
 		~beat.set(\f2, 3);
 		~beat.set(\chaos, 1);

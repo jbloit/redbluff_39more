@@ -1,7 +1,9 @@
+~fxBus = Bus.audio(s, 2);
+
 SynthDef.new(\pulse,{
 	// hack from "https://sccode.org/1-Z"
 	// removing layers
-	|out=0, f1=8, f2=3, chaos=1, amp=0.0|
+	|out=0, f1=8, f2=3, chaos=1, amp=0.0, fxBus=0, fxSend=0|
 
 	var sig1, ampMap, chaosMap;
 	ampMap = ControlSpec(0.0, 1.0);
@@ -9,7 +11,17 @@ SynthDef.new(\pulse,{
 	amp = ampMap.map(amp);
 	chaos = chaosMap.map(chaos);
 	sig1 = tanh(Impulse.kr(f1).lag*Crackle.ar(LFSaw.kr(f2).abs.lag*chaos))*5;
-	Out.ar(out, (sig1!2)*amp);
+	sig1 = (sig1!2);
+	Out.ar(out, sig1 * amp);
+	Out.ar(fxBus, sig1 * fxSend);
+
+}).add;
+
+SynthDef.new(\sawDist, {
+	var sig;
+	 sig = MantissaMask.ar(In.ar(~fxBus.index, 2) ,1);
+
+	Out.ar(0, sig);
 }).add;
 
 
