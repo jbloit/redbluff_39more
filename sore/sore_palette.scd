@@ -144,22 +144,28 @@ Synth(\wiggle, [\freq, 1300, \amp, 0.6]);
 
 ////////////////////////////////////////////// WHISPERING BASS
 
-// pick more regions
+//TODO: polyphonic looper, with N voices of (asmr +  bassmr) couples, each one with ite note. Creates interesting bass patterns.
 
 (
 ~samplesDir = "/Users/bloit/Dropbox/redbluff_transfer/ASMR/ASMR Project/";
-~asmrBuf= Buffer.read(s, ~samplesDir +/+ "japaneseASMR_mono.wav", 44100*1,  44100*2);
+~asmrBuf = Array.fill(20, {|i|
+	var startSample, numFrames;
+	startSample = 44100 * i;
+	numFrames = 44100 * 2;
+	Buffer.read(s, ~samplesDir +/+ "japaneseASMR_mono.wav", startSample, numFrames);
+});
+
 )
 
+~asmrBuf[19].bufnum
+~asmrBuf[0].bufnum
 (
 // The whisper sampler
-SynthDef(\asmr, {|out=0, sendBus=0, bufnum=0, loop=1, amp=0.1|
+SynthDef(\asmr, {|out=0, sendBus=0, bufnum=0, loop=1, amp=0.2|
 	var sig;
 	sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum), loop:loop);
 	Out.ar(out, sig*amp!2);
 	Out.ar(sendBus, sig);
-
-
 }).add;
 
 // The bass whose level is modulated from another source's envelope
@@ -174,14 +180,14 @@ SynthDef(\bassmr, {|out=0, in=0, freq=60, amp=1, atk=0.1, rel=0.1, sens=1.0|
 // ------ INIT
 (
 ~asmrOut = Bus.audio(s, 1);
-~asmr = Synth(\asmr, [\bufnum, ~asmrBuf.bufnum, \sendBus, ~asmrOut.index, \out, 5]);
+~asmr = Synth(\asmr, [\bufnum, ~asmrBuf[15].bufnum, \sendBus, ~asmrOut.index, \out, 5]);
 ~bassmr = Synth.after(~asmr, \bassmr, [\amp, 0, \in, ~asmrOut.index, \out, 0]);
-~asmr.set(\out, 0, \amp, 0)
+~asmr.set(\out, 0, \amp, 0.1)
 )
 
 
 (
-~bassmr.set(\rel, 1, \atk, 0.3, \amp, 4, \freq, 50);
+~bassmr.set(\rel, 1, \atk, 0.3, \amp, 4, \freq, 100);
 ~asmr.set(\out, 0, \amp, 0.1);
 )
 
