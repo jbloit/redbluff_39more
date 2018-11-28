@@ -197,16 +197,18 @@ SynthDef(\bassmr, {|out=0, in=0, freq=60, amp=1, atk=0.1, rel=0.1, sens=1.0|
 )
 
 
-//////////////////////////////////////////////  RHYTHMIC SYNTH
+//////////////////////////////////////////////  PATTERNING SYNTH
 
 (
 Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=1|
 	var sig, env, env2, trig, sig2;
 	trig = Pulse.ar(f0, w0);
 	env = EnvGen.ar(Env.adsr(releaseTime:SinOsc.ar(f1, 0, 1, legato)), trig).lag(0.01);
-	env2 = DelayC.ar(env, 0.2, phasing).lag(0.01);
-	sig = Saw.ar([freq, freq*2], mul:0.5);
-	sig2 = Pulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 3), mul:0.6);
+	env2 = DelayC.ar(env, 1, phasing);
+
+	// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+	sig = LFPar.ar([freq, freq*2], mul:0.5);
+	sig2 = LFPulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 3), mul:0.1);
 	Out.ar(out, Splay.ar([sig * env, sig2 * env2]*amp));
 });
 )
@@ -238,7 +240,16 @@ Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 7, \w0, 0.98)
 Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 7, \w0, 0.8)
 Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 7, \w0, 0.92)
 Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 7, \w0, 0.94)
-Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94)
+Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0)
+Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.25)
+Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.125)
+Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 50, \detune, 0.7, \legato, 0.9, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 40, \detune, 0.3, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 60, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 60, \detune, 0.1, \legato, 0.8, \f0, 8, \f1, 13, \w0, 0.94, \phasing, 0.5)
+Ndef(\arp).set(\freq, 50, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.8, \phasing, 0.5)
 
 Ndef(\arp).free
 Ndef(\arp).play
