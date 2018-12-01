@@ -89,6 +89,21 @@ SynthDef(\bassChop, {
 ~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, 3, \freq, 40, \beating, 0.4, \width, 0.9);
 )
 
+
+(
+// RONRON AIGU
+~freqChop = 18;
+~dcBus.set(~freqChop);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, 3, \freq, 8888, \beating, 0.4, \width, 0.8);
+)
+(
+// NOTE AIGU
+~freqChop = 0;
+~dcBus.set(~freqChop);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, 3, \freq, 8888, \beating, 0.4, \width, 0.8);
+)
+
+
 (
 // could modulate width, and freqChop?
 )
@@ -138,7 +153,7 @@ Synth(\wiggle, [\freq, 500]);
 )
 
 (
-Synth(\wiggle, [\freq, 1300, \amp, 0.6]);
+Synth(\wiggle, [\freq, 1300]);
 )
 
 
@@ -180,14 +195,14 @@ SynthDef(\bassmr, {|out=0, in=0, freq=60, amp=1, atk=0.1, rel=0.1, sens=1.0|
 // ------ INIT
 (
 ~asmrOut = Bus.audio(s, 1);
-~asmr = Synth(\asmr, [\bufnum, ~asmrBuf[15].bufnum, \sendBus, ~asmrOut.index, \out, 5]);
+~asmr = Synth(\asmr, [\bufnum, ~asmrBuf[19].bufnum, \sendBus, ~asmrOut.index, \out, 5]);
 ~bassmr = Synth.after(~asmr, \bassmr, [\amp, 0, \in, ~asmrOut.index, \out, 0]);
 ~asmr.set(\out, 0, \amp, 0.1)
 )
 
 
 (
-~bassmr.set(\rel, 1, \atk, 0.3, \amp, 4, \freq, 100);
+~bassmr.set(\rel, 1, \atk, 0.3, \amp, 1, \freq, 4000);
 ~asmr.set(\out, 0, \amp, 0.1);
 )
 
@@ -255,7 +270,9 @@ Ndef(\arp).set(\freq, 50, \detune, 0.2, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94
 Ndef(\arp).set(\freq, 40, \detune, 0.3, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
 Ndef(\arp).set(\freq, 60, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 14, \w0, 0.94, \phasing, 0.5)
 Ndef(\arp).set(\freq, 60, \detune, 0.1, \legato, 0.8, \f0, 8, \f1, 13, \w0, 0.94, \phasing, 0.5)
-Ndef(\arp).set(\freq, 50, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.8, \phasing, 0.5)
+Ndef(\arp).set(\freq, 200, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.8, \phasing, 0.5)
+Ndef(\arp).set(\freq, 8888, \detune, 0, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.9, \phasing, 0.125)
+Ndef(\arp).set(\freq, 8888, \detune, 0, \legato, 0.1, \f0, 16, \f1, 18, \w0, 0.9, \phasing, 0.5)
 
 Ndef(\arp).free
 Ndef(\arp).play
