@@ -39,32 +39,32 @@ SynthDef(\bassChop, {
 // single note
 ~freqChop = 0;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.3/~freqChop, \rel, 0.2/~freqChop, \curve, -3, \freq, 60, \beating, 0.3);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.3/~freqChop, \rel, 0.2/~freqChop, \curve, -3, \freq, 60, \beating, 0.3);
 )
 
 (
 ~freqChop = 5;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.6);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.6);
 )
 
 (
 // higher width creates some patterning effect
 ~freqChop = 8;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 70, \beating, 0.4, \width, 0.9);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 70, \beating, 0.4, \width, 0.9);
 )
 
 (
 ~freqChop = 8;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.8);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.8);
 )
 
 (
 ~freqChop = 10;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.8);
+~chopper.set(\amp, 0.1, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, -3, \freq, 60, \beating, 0.3, \width, 0.8);
 )
 
 
@@ -72,7 +72,7 @@ SynthDef(\bassChop, {
 // RONRON 1
 ~freqChop = 18;
 ~dcBus.set(~freqChop);
-~chopper.set(\amp, 0.5, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, 3, \freq, 50, \beating, 0.4, \width, 0.8);
+~chopper.set(\amp, 0.2, \atk, 0.01/~freqChop, \dec, 0.1/~freqChop, \rel, 0.1/~freqChop, \curve, 3, \freq, 50, \beating, 0.4, \width, 0.8);
 )
 
 (
