@@ -5,7 +5,7 @@ MIDIIn.connectAll;
 // to turn tracing off:
 // MIDIFunc.trace( false );
 
-// channel 0 = TMC6 (==channel 1 in max)
+// channel 0 = TMC6 (==channel 1 in max) OR BOPPAD
 // channel 1 = softstep controller (==channel 2 in max and in softstep editor)
 // on softstep, upper keys send program change events, mapped to section changes (1->5)
 // lower keys send notes (0->4) mapped to cue chages.
