@@ -47,18 +47,31 @@ MIDIFunc.trace( false );
 
 ~armKick = false;
 ~velKick = 0;
+
+~armSnare = false;
+~velSnare = 0;
+
+~armHat = false;
+~velHat = 0;
+
+~armTom = false;
+~velTom = 0;
+
 MIDIdef.noteOn(\noteOnTest, {
 	|vel, nn, chan |
 	switch(chan,
-		0, {~armKick = true; ~velKick = vel;}
+		0, {~armKick = true; ~velKick = vel;},
+		1, {~armSnare = true; ~velSnare = vel;},
+		2, {~armHat = true; ~velHat = vel;},
+		3, {~armTom = true; ~velTom = vel;}
 	);
 
-	postf("note %, vel %, chan % \n", nn, vel, chan);
-/*
+	// postf("note %, vel %, chan % \n", nn, vel, chan);
+	/*
 
 
 	switch (chan,
-		0, {Synth(\sampler, [\bufnum, ~kickBuffers[]]},
+	0, {Synth(\sampler, [\bufnum, ~kickBuffers[]]},
 	);*/
 	// Synth(\sampler, [\bufnum, ~percBuffers[nn], \amp, vel.linlin(0, 127, 0.0, 1.0)]);
 
@@ -72,18 +85,41 @@ MIDIdef.noteOff(\noteOffTest, {
 );
 
 MIDIdef.cc(\ccTest, {
- |val, num, chan|
+	|val, num, chan|
+
+	// Doing the triggering on CC because I need the CC info to know which sample to play. But CC only come AFTER the
+	// noteOn message...
 
 	switch(chan,
 		0, {
 			if (~armKick && (num == 2), {
-
 				Synth(\sampler, [\bufnum, ~kickBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velKick.linlin(0, 127, 0, 1)]);
-				postf("val % num % chan % \n", val, num, chan);
 				~armKick = false;
 			};
 			)
-		};
+		},
+		1, {
+			if (~armSnare && (num == 2), {
+				Synth(\sampler, [\bufnum, ~snareBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velSnare.linlin(0, 127, 0, 1)]);
+				~armSnare = false;
+			};
+			)
+		},
+		2, {
+			if (~armHat && (num == 2), {
+				Synth(\sampler, [\bufnum, ~hatBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velHat.linlin(0, 127, 0, 1)]);
+				~armHat = false;
+			};
+			)
+		},
+
+		3, {
+			if (~armTom && (num == 2), {
+				Synth(\sampler, [\bufnum, ~tomBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velTom.linlin(0, 127, 0, 1)]);
+				~armTom = false;
+			};
+			)
+		}
 	);
 
 });
