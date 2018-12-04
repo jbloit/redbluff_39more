@@ -43,13 +43,23 @@ MIDIIn.connectAll;
 
 // MIDIFunc.trace;
 // to turn tracing off:
-// MIDIFunc.trace( false );
+MIDIFunc.trace( false );
 
+~armKick = false;
+~velKick = 0;
 MIDIdef.noteOn(\noteOnTest, {
 	|vel, nn, chan |
+	switch(chan,
+		0, {~armKick = true; ~velKick = vel;}
+	);
 
 	postf("note %, vel %, chan % \n", nn, vel, chan);
+/*
 
+
+	switch (chan,
+		0, {Synth(\sampler, [\bufnum, ~kickBuffers[]]},
+	);*/
 	// Synth(\sampler, [\bufnum, ~percBuffers[nn], \amp, vel.linlin(0, 127, 0.0, 1.0)]);
 
 };
@@ -62,8 +72,20 @@ MIDIdef.noteOff(\noteOffTest, {
 );
 
 MIDIdef.cc(\ccTest, {
-	|val|
-	// val.postln;
-};);
+ |val, num, chan|
+
+	switch(chan,
+		0, {
+			if (~armKick && (num == 2), {
+
+				Synth(\sampler, [\bufnum, ~kickBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velKick.linlin(0, 127, 0, 1)]);
+				postf("val % num % chan % \n", val, num, chan);
+				~armKick = false;
+			};
+			)
+		};
+	);
+
+});
 
 
