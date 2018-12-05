@@ -4,16 +4,24 @@
 Buffer.freeAll;
 ~samplesDir = thisProcess.nowExecutingPath.dirname +/+"RedBluffAcousticDrums";
 
+~busVerb = Bus.audio(s,2);
+
 SynthDef(\sampler, {
 	|out=0, bufnum=0, amp=0.3, rate=1, timbre=1, pan=0.5|
 	var sig, sigfilt;
 	sig = PlayBuf.ar(1, bufnum, rate * BufRateScale.kr(bufnum), doneAction:2);
 	sigfilt = BPF.ar(sig, timbre.clip(0,1).linexp(0, 1, 100, 10000), 0.3);
 	sig = Mix.ar([sig*0.5, sigfilt*0.9]);
-	Out.ar(out, Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0)));
+	sig = Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0));
+	Out.ar(out, sig);
+	Out.ar(~busVerb.index, sig);
 }).add;
 
+SynthDef(\verb, {|in=3, out=0, wet=0.4|
+	Out.ar(out, GVerb.ar(In.ar(~busVerb.index, 2), drylevel:1-wet));
+}).add;
 
+~verb = Synth(\verb, [\wet, 0.1]);
 
 // PICK RANDOM SAMPLES
 ~kickBuffers= Array.newClear(3);
@@ -93,7 +101,7 @@ MIDIdef.cc(\ccTest, {
 	switch(chan,
 		0, {
 			if (~armKick && (num == 2), {
-				Synth(\sampler, [\bufnum, ~kickBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velKick.linlin(0, 127, 0, 1)]);
+				Synth(\sampler, [\bufnum, ~kickBuffers[val.linlin(0, 127, 0, 2)], \amp, ~velKick.linlin(0, 127, 0, 2)]);
 				~armKick = false;
 			};
 			)
