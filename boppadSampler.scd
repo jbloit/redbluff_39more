@@ -1,7 +1,6 @@
 
 ///////////////////////////////////////////////////////////////////////////// INIT SAMPLER FOR MOCKUP
 
-Buffer.freeAll;
 ~samplesDir = thisProcess.nowExecutingPath.dirname +/+"RedBluffAcousticDrums";
 
 ~busVerb = Bus.audio(s,2);
@@ -21,7 +20,7 @@ SynthDef(\verb, {|in=3, out=0, wet=0.4|
 	Out.ar(out, GVerb.ar(In.ar(~busVerb.index, 2), drylevel:1-wet));
 }).add;
 
-~verb = Synth(\verb, [\wet, 0.1]);
+~verb = Synth(\verb, [\wet, 0.5]);
 
 // PICK RANDOM SAMPLES
 ~kickBuffers= Array.newClear(3);
@@ -65,7 +64,7 @@ MIDIFunc.trace( false );
 ~armTom = false;
 ~velTom = 0;
 
-MIDIdef.noteOn(\noteOnTest, {
+MIDIdef.noteOn(\noteOnPad, {
 	|vel, nn, chan |
 	switch(chan,
 		0, {~armKick = true; ~velKick = vel;},
@@ -86,13 +85,13 @@ MIDIdef.noteOn(\noteOnTest, {
 };
 );
 
-MIDIdef.noteOff(\noteOffTest, {
+MIDIdef.noteOff(\noteOffPad, {
 	|vel, nn |
 	// [vel, nn].postln;
 };
 );
 
-MIDIdef.cc(\ccTest, {
+MIDIdef.cc(\ccPad, {
 	|val, num, chan|
 
 	// Doing the triggering on CC because I need the CC info to know which sample to play. But CC only come AFTER the

@@ -221,7 +221,7 @@ SynthDef(\bassmr, {|out=0, in=0, freq=60, amp=1, atk=0.1, rel=0.1, sens=1.0|
 //////////////////////////////////////////////  PATTERNING SYNTH
 
 (
-Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=1|
+Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=9, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=1|
 	var sig, env, env2, trig, sig2;
 	trig = Pulse.ar(f0, w0);
 	env = EnvGen.ar(Env.adsr(releaseTime:SinOsc.ar(f1, 0, 1, legato)), trig).lag(0.01);
@@ -273,6 +273,7 @@ Ndef(\arp).set(\freq, 60, \detune, 0.1, \legato, 0.8, \f0, 8, \f1, 13, \w0, 0.94
 Ndef(\arp).set(\freq, 200, \detune, 0.1, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.8, \phasing, 0.5)
 Ndef(\arp).set(\freq, 8888, \detune, 0, \legato, 0.1, \f0, 8, \f1, 13, \w0, 0.9, \phasing, 0.125)
 Ndef(\arp).set(\freq, 8888, \detune, 0, \legato, 0.1, \f0, 16, \f1, 18, \w0, 0.9, \phasing, 0.5)
+Ndef(\arp).set(\freq, 8888, \detune, 0, \legato, 0.1, \f0, 10, \f1, 16, \w0, 0.9, \phasing, 0.5)
 
 Ndef(\arp).free
 Ndef(\arp).play

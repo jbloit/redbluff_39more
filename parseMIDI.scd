@@ -12,7 +12,7 @@ MIDIIn.connectAll;
 // lower keys send notes (0->4) mapped to cue chages.
 
 MIDIdef.program(\program, {|num, chan|
-
+	postf("PROGRAM CHANGE % on chan % \n", num, chan);
 	switch (chan,
 		0, {},
 		1, {
@@ -20,7 +20,9 @@ MIDIdef.program(\program, {|num, chan|
 			if (num > 0)
 			{
 				~currentSection = num - 1;
+				post("CALLING SECTION % \n", ~currentSection);
 				~sections[~currentSection].value();
+
 			}
 			{};
 		},
@@ -31,11 +33,9 @@ MIDIdef.program(\program, {|num, chan|
 MIDIdef.noteOn(\noteOn, {
 	|vel, nn, chan |
 	postf("NOTE ON % % %\n", nn, vel, chan);
-	switch (chan,
-		0, {
-			~trigs[~currentSection, ~currentCue].value(nn, vel);
-		},
-		15, {
+
+	if (chan==15,
+		{
 			if (vel > 0)
 			{
 				~currentCue = nn;
@@ -43,6 +43,9 @@ MIDIdef.noteOn(\noteOn, {
 			}
 			{};
 		},
+		{
+			~trigs[~currentSection, ~currentCue].value(nn, vel);
+		}
 	);
 };
 );

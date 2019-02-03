@@ -27,13 +27,13 @@ SynthDef(\bassmr, {|out=0, in=0, freq=90, amp=1, atk=0.1, rel=0.1, sens=1.0|
 	env = Amplitude.kr(In.ar(in) * sens, atk, rel);
 	Out.ar(out, LFPar.ar(freq, mul:env * amp)!2);
 }
-).add
+).add;
 
 
 //////////////////////////////////////////////  PATTERNING SYNTH
 
-/*
-Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=1|
+
+SynthDef(\arp, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=1|
 	var sig, env, env2, trig, sig2;
 	trig = Pulse.ar(f0, w0);
 	env = EnvGen.ar(Env.adsr(releaseTime:SinOsc.ar(f1, 0, 1, legato)), trig).lag(0.01);
@@ -43,10 +43,10 @@ Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, legat
 	sig = LFPar.ar([freq, freq*2], mul:0.5);
 	sig2 = LFPulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 3), mul:0.1);
 	Out.ar(out, Splay.ar([sig * env, sig2 * env2]*amp));
-});
-)
+}).add;
 
 
+/*
 Ndef(\arp).play
 
 Ndef(\arp).set(\amp, 0.2)
