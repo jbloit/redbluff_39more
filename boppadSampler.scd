@@ -1,9 +1,10 @@
 
 ///////////////////////////////////////////////////////////////////////////// INIT SAMPLER FOR MOCKUP
+// s.latency = 0.01;
 
+// s.reboot;
 ~samplesDir = thisProcess.nowExecutingPath.dirname +/+"RedBluffAcousticDrums";
 
-~busVerb = Bus.audio(s,2);
 
 SynthDef(\sampler, {
 	|out=0, bufnum=0, amp=0.3, rate=1, timbre=1, pan=0.5|
@@ -13,14 +14,7 @@ SynthDef(\sampler, {
 	sig = Mix.ar([sig*0.5, sigfilt*0.9]);
 	sig = Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0));
 	Out.ar(out, sig);
-	Out.ar(~busVerb.index, sig);
 }).add;
-
-SynthDef(\verb, {|in=3, out=0, wet=0.4|
-	Out.ar(out, GVerb.ar(In.ar(~busVerb.index, 2), drylevel:1-wet));
-}).add;
-
-~verb = Synth(\verb, [\wet, 0.5]);
 
 // PICK RANDOM SAMPLES
 ~kickBuffers= Array.newClear(3);
