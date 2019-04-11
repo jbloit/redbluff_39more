@@ -1,3 +1,5 @@
+s.latency = 0.1
+
 (
 // init the labels writing process
 
@@ -11,12 +13,28 @@ AppClock.sched(0,{
 	//~currTime.postln;
 	1});
 
+
+~prevPart = -1;
+~prevSection = -1;
+
+
+
 // a function to write label and post to console for a new section
 ~cue =  {|part=0, section=0|
 	var str;
 	postf("Part % section % at time %\n", part, section, ~currTime);
 	str = format("%\t%\t%-%\n", ~currTime, ~currTime, part, section);
 	f.write(str);
+
+
+	// trigger a drum pdef
+	Pdef((\p++part++'s'++section).asSymbol).play(quant:1);
+
+	// stop the previous one
+	Pdef((\p++~prevPart++'s'++~prevSection).asSymbol).stop;
+
+	~prevPart = part;
+	~prevSection = section;
 };
 )
 
@@ -29,6 +47,10 @@ Ndef(\arp).clear;
 Ndef(\arp3).clear;
 Ndef(\arp2).clear;
 
+Ndef(\arp).quant = 1;
+Ndef(\arp2).quant = 1;
+Ndef(\arp3).quant = 1;
+Ndef(\beat).quant = 1;
 
 Ndef(\arp3, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
 	var sig, env, env2, trig, sig2;
@@ -126,6 +148,9 @@ Tdef(\bass,{loop{
 	12.wait;
 }}).play;
 
+
+
+
 )
 
 s.meter;
@@ -161,9 +186,6 @@ Tdef(\test2,{
 			Out.ar(0, 0.25*sig!2);
 	};);
 	48.wait;
-
-
-
 
 	~cue.value(1,6);
 

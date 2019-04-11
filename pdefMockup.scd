@@ -39,6 +39,8 @@ FX in =  ~fxBus;
 ///////////////////////////////////////////////////////////////////////////// INIT SAMPLER FOR MOCKUP
 (
 
+t = TempoClock.tempo = 60/60;
+
 ~fxBus = Bus.audio(s, 2);
 
 ~samplesDir = thisProcess.nowExecutingPath.dirname +/+"RedBluffAcousticDrums";
@@ -85,16 +87,439 @@ SynthDef(\sampler, {
 )
 /////////////////////////////////////////////////////////////////////////// MIDI IN
 
-t = TempoClock.tempo = 60/60;
+
+
+
+
+
+////////////////////////////////////////// 3 layers riffs for wenzhu
+
 
 
 (
+
+//////////////// 1
+
+(
+Pdef(\p1s1, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(1.5),3, 1.5]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 0;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+
+);
+/////////////////////// 2
+(
+Pdef(\p1s2, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(1.5),3, 1.5]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+
+
+////////////////////////////////// 3
+(
+Pdef(\p1s3, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),13/4, 6/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+
+
+////////////////////////////////// 4
+(
+Pdef(\p1s4, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),13/4, 6/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7,6,7,6,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+////////////////////////////////// 5
+(
+Pdef(\p1s5, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 3/4, 3/4, 1/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),11/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+
+////////////////////////////////// 6
+(
+Pdef(\p1s6, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 7/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),8/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+
+////////////////////////////////// 7
+(
+Pdef(\p1s7, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 6/4, 7/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,6/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+////////////////////////////////// 8
+(
+Pdef(\p1s8, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 1/4, 5/4, 7/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,6/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+////////////////////////////////// 9
+(
+Pdef(\p1s9, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 1/4, 5/4, 1/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6], inf),
+			\amp, 1;
+s		)
+	]
+));
+);
+
+
+////////////////////////////////// 10
+(
+Pdef(\p1s10, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 1/4, 5/4, Rest(1/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 1/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+////////////////////////////////// 11
+(
+Pdef(\p1s11, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 1/4, 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+////////////////////////////////// 11
+(
+ Pdef(\p1s12, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, 1/4, 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7], inf),
+			\amp, 1;
+		)
+	]
+));
+);
+
+)
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////   EXPERIMENTS
+
+
+/*
+
+(
 Pdef(\kick, Pbind(\instrument, \sampler,
-	\dur, Prand([1/4], inf),
+	\dur, Prand([1/4], 4),
 	\pan, Prand([0,1, 0.5], inf),
 	\timbre, Pwhite(0.0, 1.0, inf),
 	\bufnum, 0,
-	\amp, Prand([0.3, 2, 4], inf))).play
+	\amp, Prand([0.3, 2, 4], inf))).play;
 )
 
 (
@@ -303,8 +728,6 @@ Ndef(\fx).set(\freq, 90);
 
 
 Pdef(\kick).stop;
-
-
 (
 Pdef(\kick1, Pbind(\instrument, \sampler,
 	\dur, Prand([1/4], inf),
@@ -327,48 +750,6 @@ Pdef(\kick, Pbind(\instrument, \sampler,
 	\bufnum, Prand([4], inf),
 	\amp, Prand([0.3], inf))).play;
 )
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  FX
-(
-SynthDef(\rez,{
-	|in=0,  pitchNorm= 1, timbre=0.1|
-	var sig;
-	var input = In.ar(~fxBus, 2);
-	sig = DynKlank.ar(`[[800, 1071, 1153, 1723] * pitchNorm, [1,1,1,1]*timbre, [1, 1, 1, 1]*timbre], input);
-	Out.ar(0, sig);
-}
-).add;
-)
 
+*/
 
-a = Synth(\rez);
-a.set(\timbre, 0.4, \pitchNorm, 10);
-a.free;
-
-
-(
-SynthDef(\verb, {|roomsize, revtime, damping, inputbw, spread = 15, drylevel, earlylevel, taillevel|
-
-	var input = In.ar(~fxBus, 2);
-
-	    Out.ar(0, GVerb.ar(
-		        input,
-		        roomsize,
-		        MouseX.kr(1, 20.0),
-		        MouseX.kr(0.0, 1.0),
-		        inputbw,
-		        spread,
-		        drylevel.dbamp,
-		        earlylevel.dbamp,
-		        taillevel.dbamp,
-		        roomsize, 0.3) + input)}).add
-
-)
-
-//living room
-a = Synth(\verb, [\roomsize, 16, \revtime, 1.24, \damping, 0.10, \inputbw, 0.95, \drylevel -30, \earlylevel, -3, \taillevel, -3]);
-a.free;
-
-SynthDef(\snafm,{
-
-});
