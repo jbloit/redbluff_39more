@@ -605,7 +605,7 @@ Ndef(\arp).fadeTime=0.1;
 	"3".postln;
 	~cue.value(4,3);
 
-
+	Ndef(\bass).fadeTime=8;
 	Ndef(\bass,{
 		(SinOsc.ar([112,112.5]/1.5)*0.4)+(BRF.ar(LFSaw.ar([112+0.05,112.5+0.05]/1.5,0,0.05),700,4)+BRF.ar(LFSaw.ar([112,112.5]/1.5,0,0.1),800,4))*SinOsc.ar(1/16)+SinOsc.ar([13005,13000.5],0,0.1) ;
 	}).play;
