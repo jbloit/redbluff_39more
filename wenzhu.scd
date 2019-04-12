@@ -1,5 +1,5 @@
 s.latency = 0.1
-
+s.meter;
 (
 // init the labels writing process
 
@@ -133,6 +133,7 @@ Tdef(\bass,{loop{
 	~cue.value(1,3);
 
 
+
 	Ndef(\arp2).map(\f0,8);
 	Ndef(\arp2).play;
 	Ndef(\arp2).map(\rel,Ndef(\lfo1,{SinOsc.ar(9/3, 0, 1, 0.1)}).asMap);
@@ -209,6 +210,7 @@ Tdef(\test2,{
 	24.wait;
 
 
+
 	~cue.value(1,7);
 
 
@@ -271,13 +273,13 @@ Tdef(\test2,{
 
 
 	~cue.value(1,11);
-
+	Ndef(\whitenoise).fadeTime=0.1;
 	Pdef(\note4,Pbind(\instrument,\default,\dur,4,\freq,Pseq([71,75,77,79,80,83,86,89],inf).midicps)).play;
 	Ndef(\whitenoise,{
 		WhiteNoise.ar(1!2)*In.ar(0,2)*0.1
 	}).play;
 
-	94.wait;
+	46.wait;
 
 	Ndef(\bass).fadeTime=2;
 	Ndef(\bass,{
@@ -380,7 +382,13 @@ Tdef(\test2,{
 
 
 
-	24.wait;
+	20.wait;
+			Ndef(\bass).free;
+			Pdef(\note).stop;
+			Pdef(\note2).stop;
+			Pdef(\note3).stop;
+			Pdef(\note4).stop;
+	4.wait;
 
 	~cue.value(2,2);
 	"2".postln;
@@ -414,9 +422,9 @@ Tdef(\test2,{
 	Ndef(\sin4).free;
 
 	12.wait;
-	Ndef(\sin).fadeTime=0;
-	Ndef(\sin2).fadeTime=0;
-	Ndef(\sin3).fadeTime=0;
+	Ndef(\sin).fadeTime=0.1;
+	Ndef(\sin2).fadeTime=0.1;
+	Ndef(\sin3).fadeTime=0.1;
 
 	Ndef(\sin).free;
 	Ndef(\sin2).free;
@@ -443,7 +451,7 @@ Tdef(\test2,{
 	~cue.value(3,0);
 
 	"partie3".postln;
-
+Ndef(\arp).fadeTime=0.1;
 	Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=16, f1=2.7, w0=0.9 phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
 		var sig, env, env2, trig, sig2;
 		trig = LFPulse.ar(f0, w0);
@@ -539,10 +547,9 @@ Tdef(\test2,{
 	24.wait;
 
 	Pdef.clear;
-
 	"partie3".postln;
 	"break".postln;
-	~asmr = Buffer.read(s,"/home/jbloit/Dropbox/sounds/ASMR/japaneseASMR_mono.wav");
+	~asmr = Buffer.read(s,"/home/unknown/Downloads/japaneseASMR_mono.wav");
 	SynthDef(\help_PlayBuf, {| out = 0, bufnum = 0 |
 		Out.ar([0,1],
 			PlayBuf.ar(2, bufnum, BufRateScale.kr(bufnum), doneAction: Done.freeSelf)*0.5
@@ -580,7 +587,7 @@ Tdef(\test2,{
 	"2".postln;
 	~cue.value(4,2);
 
-
+Ndef(\arp).fadeTime=0.1;
 	Ndef(\arp, {|out=0, freq=55, detune=0.3, f0=16, f1=2.7, w0=0.9 phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
 		var sig, env, env2, trig, sig2;
 		trig = Pulse.ar(f0, w0);
@@ -646,7 +653,7 @@ Tdef(\test2,{
 	"5".postln;
 
 
-
+	Ndef(\cross).fadeTime=0.1;
 	Ndef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2;
 		var sig = In.ar(0,2);
 		sig = CrossoverDistortion.ar(sig,amp,SinOsc.ar([freq,freq+0.5],0,0.1,smooth),mul);
@@ -679,7 +686,7 @@ Tdef(\test2,{
 	"7".postln;
 	~cue.value(4,7);
 
-
+	Ndef(\lownoise).fadeTime=0.1;
 
 	Ndef(\lownoise,{
 		LPF.ar(WhiteNoise.ar(1!2)*In.ar(0,2)*Line.kr(0,1,1)*0.5,500)
@@ -730,7 +737,6 @@ Tdef(\test2,{
 	24.wait;
 	"10".postln;
 	~cue.value(4,10);
-
 
 	Ndef(\whitenoise).free;
 	Ndef(\whitenoise,{
@@ -880,13 +886,15 @@ Tdef(\test2,{
 
 
 	Ndef(\whitenoise,{
-		HPF.ar(WhiteNoise.ar(1!2)*In.ar(0,2)*Line.kr(0,1,1),200)
+		HPF.ar(WhiteNoise.ar(1!2)*In.ar(0,2)*Line.kr(0,0.2,1),200)
 	}).play;
 	12.wait;
 	"20".postln;
 	~cue.value(4,20);
 
 
+
+	Ndef(\whitenoise).free;
 	Ndef(\arp4, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
 		var sig, env, env2, trig, sig2;
 		trig = Pulse.ar(f0, w0);
@@ -914,21 +922,21 @@ Tdef(\test2,{
 		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
 		sig = LPF.ar(LFSaw.ar([freq*2, freq*2.05]*Duty.kr(1,0,Dseq([2,2,2,1]*2,inf)), mul:0.5)+LFSaw.ar([freq*2, freq*2.05]*Duty.kr(1,0,Dseq([4,4,4,2],inf))+0.01, mul:0.5),lpf);
 		sig2 = LFPulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 100), mul:0.1);
-		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*1));
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
 	}).play;
 
 	12.wait;
 
 	"22".postln;
 	~cue.value(4,22);
-
-
-
+/*
 	Pdef(\note2,Pbind(\instrument,\default,\dur,4,\lag,0.5,\freq,Pseq([440,424,440,848],inf))).play;
 	Pdef(\note3,Pbind(\instrument,\default,\dur,4,\freq,Pseq([440,424,440,328]/2,inf))).play;
 	Pdef(\note4,Pbind(\instrument,\default,\dur,4,\freq,Pseq([71,75,77,79,80,83,86,89],inf).midicps)).play;
 
 	24.wait;
+			*/
+
 
 
 	Ndef(\arp5, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
@@ -939,11 +947,229 @@ Tdef(\test2,{
 		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
 		sig = LPF.ar(LFSaw.ar([freq*2, freq*2.05]*Duty.kr(4,0,Dseq([2,2,2,1]*2,inf)), mul:0.5)+LFSaw.ar([freq*2, freq*2.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.01, mul:0.5),lpf);
 		sig2 = LFPulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 100), mul:0.1);
-		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*1));
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
 	}).play;
 
-	24.wait;
+	12.wait;
 
+
+
+
+	Ndef(\bass,{
+		(SinOsc.ar([112,112.5]/1.5)*0.4)+(BRF.ar(LFSaw.ar([112+0.05,112.5+0.05]/1.5,0,0.05),700,4)+BRF.ar(LFSaw.ar([112,112.5]/1.5,0,0.1),800,4))*SinOsc.ar(4)*Line.kr(0,1,64);
+	}).play;
+
+	12.wait;
+
+	Ndef(\arp6, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.1, freq+0.06]*Duty.kr(4,0,Dseq([2,2,2,1]*2,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.1, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq, freq*2] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+
+	12.wait;
+
+
+	Ndef(\arp7, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.2, freq+0.07]*Duty.kr(4,0,Dseq([2,2,2,1]*2.01,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.2, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq+0.01, freq*2.01] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+	12.wait;
+
+	Ndef(\arp8, {|out=0, freq=55, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.3, freq+0.03]*Duty.kr(4,0,Dseq([2,2,2,1]*2.03,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.3, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq+0.03, freq*2.03] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+
+	12.wait;
+
+	Ndef(\arp8).set(\freq,89);
+	12.wait;
+	Ndef(\arp8).set(\freq,89*2);
+	12.wait;
+
+				Ndef(\arp9, {|out=0, freq=220.1, detune=0.3, f0=8, f1=2.7, w0=0.95, phasing=0, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.3, freq+0.03]*Duty.kr(4,0,Dseq([2,2,2,1]*2.03,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.3, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq+0.03, freq*2.03] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+	12.wait;
+
+
+		Ndef(\arp1, {|out=0, freq=440.2, detune=0.3, f0=8, f1=0.675, w0=0.2375, phasing=0.5, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.3, freq+0.03]*Duty.kr(4,0,Dseq([2,2,2,1]*2.03,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.3, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq+0.03, freq*2.03] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+	12.wait;
+
+	Ndef(\bass2,{
+		(SinOsc.ar([112,112.5]/1.5)*0.5)+(BRF.ar(LFSaw.ar([112+0.06,112.5+0.06]/1.5,0,0.05),700,4)+BRF.ar(LFSaw.ar([112.1,112.6]/1.5,0,0.1),800,4))*SinOsc.ar(2)*Line.kr(0,1,64);
+	}).play;
+	12.wait;
+
+		Ndef(\arp2, {|out=0, freq=880.4, detune=0.3, f0=8, f1=0.675, w0=3.8, phasing=0.5, legato=0.5, amp=0.5,rel=0.1,lpf=1000|
+		var sig, env, env2, trig, sig2;
+		trig = Pulse.ar(f0, w0);
+		env = EnvGen.ar(Env.adsr(releaseTime:rel),trig).lag(0.01);
+		env2 = DelayC.ar(env, 1, phasing);
+		// experiment replacing oscillators (LFPulse, LFCub, LFTri, LFSaw, etc)
+		sig = LPF.ar(LFSaw.ar([freq+0.3, freq+0.03]*Duty.kr(4,0,Dseq([2,2,2,1]*2.03,inf)), mul:0.5)+LFSaw.ar([freq, freq+0.05]*Duty.kr(4,0,Dseq([4,4,4,2],inf))+0.3, mul:0.5),lpf);
+		sig2 = LFPulse.ar([freq+0.03, freq*2.03] + detune.linlin(0, 1, 0, 100), mul:0.1);
+		Out.ar(out, Splay.ar([sig * env*0.5, sig2 * env2]*amp*Line.kr(0,1,64)));
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin,{
+		SinOsc.ar([112,112.5])*SinOsc.kr(1/32)*0.1
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin2,{
+		SinOsc.ar([112,112.5]*2)*SinOsc.kr(0.1)*0.1
+	}).play;
+
+	12.wait;
+
+	Ndef(\sin3,{
+		SinOsc.ar([112,112.5]*3.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin4,{
+		SinOsc.ar([112,112.5]*4)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin5,{
+		SinOsc.ar([112,112.5]*5.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+	Ndef(\sin6,{
+		SinOsc.ar([112,112.5]*6.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+
+	12.wait;
+
+
+	Ndef(\sin7,{
+		SinOsc.ar([112,112.5]*8)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+	Ndef(\sin8,{
+		SinOsc.ar([112,112.5]*9.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin9,{
+		SinOsc.ar([112,112.5]*10.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+
+	Ndef(\sin10,{
+		SinOsc.ar([112,112.5]*12)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+
+
+	Ndef(\sin11,{
+		SinOsc.ar([112,112.5]*12.5)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	12.wait;
+
+
+	Ndef(\sin12,{
+		SinOsc.ar([112,112.5]*14)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+
+	12.wait;
+
+
+	Ndef(\sin13,{
+		SinOsc.ar([112,112.5]*16)*SinOsc.kr(0.11)*0.01
+	}).play;
+
+
+	12.wait;
+
+
+	Ndef(\sin14,{
+		SinOsc.ar([11200,11250])*SinOsc.kr(0.11)*0.01
+	}).play;
+
+	Ndef(\sin3).free;
+	Ndef(\sin4).free;
+	Ndef(\sin5).free;
+	Ndef(\sin6).free;
+	Ndef(\sin7).free;
+	Ndef(\sin8).free;
+	Ndef(\sin9).free;
+	Ndef(\sin10).free;
+	Ndef(\sin11).free;
+	Ndef(\sin12).free;
+	Ndef(\sin13).free;
+	Ndef(\sin14).free;
+
+	12.wait;
+
+
+	Ndef(\sin).free;
+	Ndef(\sin2).free;
 
 	"fin".postln;
 	f.close; // close file
@@ -952,7 +1178,6 @@ Tdef(\test2,{
 	1.wait;
 }).play;
 )
-
 
 f.close
 
@@ -1197,7 +1422,6 @@ s.meter;
 s.latency=0.001;
 
 s.meter;
-
 
 
 
