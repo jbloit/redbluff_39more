@@ -60,6 +60,35 @@ SynthDef(\sampler, {
 }).add;
 
 
+SynthDef(\bass, {|freq=200, amp=0.1, gate=1, out=0|
+	var sig, env;
+
+	sig = LFPar.ar(freq);
+	env = EnvGen.ar(Env.adsr(0.04, 0.2, 0.6, 0.01), gate, doneAction:2);
+	sig = sig*env;
+	Out.ar(out, sig *amp !2 )
+
+}).add;
+
+
+SynthDef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2, out=0;
+	var sig = In.ar(~fxBus.index,2);
+	sig = CrossoverDistortion.ar(sig,amp,SinOsc.ar([freq,freq+0.5],0,0.1,smooth),mul);
+	//sig = FreeVerb.ar(sig,0.5,0.5);
+	sig = sig + CombC.ar(sig,0.1,1/8,0.1);
+	sig = sig ;
+	//sig = SineShaper.ar(sig, 1,0.5);
+	sig = BRF.ar(sig,432,15,-10);
+	sig = HPF.ar(sig,432/2);
+//	sig = Limiter.ar(sig,0.5);
+	sig = LeakDC.ar(sig);
+//	sig = Compander.ar(sig,In.ar(4,2),0.1,1,0.25,0.1,0.01);
+	sig = [DelayL.ar(sig*(-1),0.1,SinOsc.kr(-0.1,0,0.05,0.1)),DelayL.ar(sig*(-1),0.1,SinOsc.kr(0.1,0,0.05,0.1))]*0.1;
+	Out.ar(out, sig);
+}).add;
+
+
+
 
 // Ndef(\fx).stop;
 
@@ -469,7 +498,7 @@ Pdef(\p1s11, Ppar(
 ));
 );
 
-////////////////////////////////// 11
+////////////////////////////////// 12
 (
  Pdef(\p1s12, Ppar(
 	[
@@ -496,7 +525,7 @@ Pdef(\p1s11, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 1;
+			\amp, 0;
 		)
 	]
 ));
@@ -504,6 +533,382 @@ Pdef(\p1s11, Ppar(
 
 )
 
+
+////////////////////////////////// 13
+(
+ Pdef(\p1s13, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7], inf),
+			\amp, 0;
+		)
+	]
+));
+);
+
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 1
+(
+ Pdef(\p2s1, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 3;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7], inf),
+			\amp, 0;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, 0.4,
+			\amp, 1,
+		)
+	]
+));
+);
+
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 2
+(
+ Pdef(\p2s2, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 3,
+			\amp, 0;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, 1/4,
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6,7,8,7,6,7], inf),
+			\amp, 0;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 3
+(
+// Pdef(\p2s3, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(3/4), 3/4], inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4]/2, inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6], inf),
+			\amp, 1;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 4
+(
+ Pdef(\p2s4, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(3/4), 3/4], inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([1/2], inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6], inf),
+			\amp, 1;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 5
+(
+ Pdef(\p2s5, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/2, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([1/2], inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([8, 6], inf),
+			\amp, 0.5;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 6
+(
+ Pdef(\p2s6, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/4, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([1/2], inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([8, 6], inf),
+			\amp, 0.5;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 7
+(
+ Pdef(\p2s7, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/4, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([1/2], inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([8, 6], inf),
+			\amp, 0.5;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, [50, 8000],
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 8
+// ADD DISTORSION HERE
+
+(
+ Pdef(\p2s8, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/4, inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([1/2], inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([8, 6], inf),
+			\amp, 0;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, [50, 8000],
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
+	]
+));
+);
+
+
+d = Synth(\cross);
+
+
+(
+Pdef(\p2s7).stop;
+Pdef(\p2s8).play;
+)
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
