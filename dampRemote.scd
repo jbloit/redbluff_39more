@@ -22,7 +22,6 @@ s.freeAll;  // free all nodes
 
 {SinOsc.ar()}.play;
 
-
 (
 MIDIClient.init;
 MIDIIn.connectAll;
@@ -73,7 +72,7 @@ SynthDef(\par, {|in=0, out=0, timbre=1|
 
 )
 s.freeAll;
-
+ ~fx1.free
 
 (
 MIDIdef.cc(\ccTest, {
