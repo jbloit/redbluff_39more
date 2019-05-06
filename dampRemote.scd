@@ -8,16 +8,21 @@ Get them here: https://github.com/sensestage/bela-remote
 *****/
 
 
-( // connect to the already-running remote belaserver
-Server.default = s = Server("belaServer", NetAddr("192.168.7.2", 57110));
-s.options.maxLogins = 4; // should match the settings on the Bela
-s.initTree;
-s.startAliveThread;
+( // connect to the already-running remote belaservers
+z = Server("belaServer", NetAddr("192.168.7.2", 57110));
+z.options.maxLogins = 4; // should match the settings on the Bela
+z.initTree;
+z.startAliveThread;
 );
 
+s = Server.local
+
+Server.local = z;
+
+
 // Communicate with the server
-s.plotTree; // show all active nodes
-s.freeAll;  // free all nodes
+z.plotTree; // show all active nodes
+z.freeAll;  // free all nodes
 
 
 {SinOsc.ar()}.play;
@@ -72,7 +77,7 @@ SynthDef(\par, {|in=0, out=0, timbre=1|
  //~fx2 = Synth.after(~fx1, \par, [\in, ~fxBus2]);
 
 )
-s.freeAll;
+z.freeAll;
 
 
 (
