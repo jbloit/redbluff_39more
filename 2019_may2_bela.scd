@@ -58,6 +58,15 @@ SynthDef(\noise, {|freq=1000|
 	Out.ar(0, [sig, sig2]);
 }).add;
 
+
+SynthDef(\bip,
+	{
+		|amp=0.1, freq=1000, out=0|
+		var sig;
+		sig = SinOsc.ar(freq:freq, mul: EnvGen.ar(Env.perc(0.001, level:amp), doneAction:2));
+		Out.ar(out, sig);
+}).add;
+
 )
 (
 s.freeAll;
@@ -165,7 +174,13 @@ MIDIdef.program(\section, {|val|
 					~overtone.set(\val, 1);
 
 					// distortion
+					~in1.set(\out, ~fxBus1);
 					~in2.set(\out, ~fxBus1);
+					~in0.set(\out, 0);
+					~in3.set(\out, 3);
+
+
+
 					~fx1.set(\amp, 1);
 					~fx1.set(\filterFreq, 1000);
 					~fx1.set(\smooth, 0.9);
@@ -204,7 +219,9 @@ MIDIdef.program(\section, {|val|
 							~pitch.set(\val, 0.07);
 							~decay.set(\val, 0.3);
 							~balance.set(\val, 0.rrand(1.0));
-							~fx1.set(\rezFreq, 400.rrand(1000));
+							~fx1.set(\rezFreq, 400.rrand(10000));
+							if (~hatCount%3 == 0, {
+								Synth(\bip, [\out, 2, \freq, 2000, \amp, 0.1]);});
 						});
 					}, chan:2);
 
