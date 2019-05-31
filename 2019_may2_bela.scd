@@ -18,11 +18,10 @@ SynthDef(\mic, {
 	Out.ar(out, sig);
 }).add;
 
-
-SynthDef(\fx1,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, in=0, out=0|
+// distortion
+SynthDef(\fx1,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, rezFreq=400, in=0, out=0|
 
 	var sig = In.ar(in,1);
-
 
 	filterFreq = filterFreq.clip(50, 2000);
 	sig = CrossoverDistortion.ar(sig,amp,SinOsc.ar([freq,freq+0.5],0,0.1,smooth),mul);
@@ -32,14 +31,15 @@ SynthDef(\fx1,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, in=0, out=0
 	//sig = SineShaper.ar(sig, 1,0.5);
 	sig = BRF.ar(sig,filterFreq,15,-10);
 	sig = HPF.ar(sig,filterFreq/2);
+
+	sig = Resonz.ar(sig, rezFreq);
+
 	//	sig = Limiter.ar(sig,0.5);
 	sig = LeakDC.ar(sig);
 	sig = Compander.ar(sig,In.ar(4,2),0.1,1,0.25,0.1,0.01);
-
-
-
 	Out.ar(out, sig);
 }).add;
+
 
 
 
@@ -53,26 +53,30 @@ SynthDef(\noise, {|freq=1000|
 	mod = SinOsc.ar(0.1, mul:300);
 	sig = PinkNoise.ar(0.5);
 	sig = HPF.ar(sig, freq:800 + mod);
-	sig2 = BPF.ar(sig, freq:freq + mod );
+	freq = 	(freq  + mod).clip(1, 10000);
+	sig2 = BPF.ar(sig, freq: freq);
 	Out.ar(0, [sig, sig2]);
 }).add;
 
-
 )
 (
-s.freeAll
+s.freeAll;
+MIDIdef.freeAll;
 )
+
 
 
 (
 
-~fxBus = Bus.audio(s, 1);
+~fxBus1 = Bus.audio(s, 1);
+// ~fxBus2 = Bus.audio(s, 2);
 
 ~in0 = Synth(\mic, [\in, 0, \out, 0]);
 ~in1 = Synth(\mic, [\in, 1, \out, 1]);
 ~in2 = Synth(\mic, [\in, 2, \out, 2]);
 ~in3 = Synth(\mic, [\in, 3, \out, 3]);
-~fx1 = Synth.after(~in1, \fx1, [\in,  ~fxBus, \out, 1]);
+~fx1 = Synth.after(~in1, \fx1, [\in,  ~fxBus1, \out, 1]);
+
 ~pitch = Synth(\dc, [\out, 2]);
 ~decay = Synth(\dc, [\out, 3]);
 ~balance = Synth(\dc, [\out, 4]);
@@ -105,8 +109,11 @@ MIDIdef.program(\section, {|val|
 					~decay.set(\val, 0.3);
 					~balance.set(\val, 1);
 					~overtone.set(\val, 1);
+					~in0.set(\out, 0);
 					~in1.set(\out, 1);
 					~in2.set(\out, 2);
+					~in3.set(\out, 3);
+
 
 					MIDIdef.noteOn(\kick, {|val|
 						// val.postln;
@@ -145,10 +152,6 @@ MIDIdef.program(\section, {|val|
 
 				)
 
-
-
-
-
 			},
 
 
@@ -161,15 +164,11 @@ MIDIdef.program(\section, {|val|
 					~balance.set(\val, 1);
 					~overtone.set(\val, 1);
 
-
 					// distortion
-					~in1.set(\out, ~fxBus);
-					~in2.set(\out, ~fxBus);
+					~in2.set(\out, ~fxBus1);
 					~fx1.set(\amp, 1);
 					~fx1.set(\filterFreq, 1000);
 					~fx1.set(\smooth, 0.9);
-
-
 
 
 					MIDIdef.noteOn(\kick, {|val|
@@ -204,14 +203,19 @@ MIDIdef.program(\section, {|val|
 							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
 							~pitch.set(\val, 0.07);
 							~decay.set(\val, 0.3);
-							~balance.set(\val, 0.rrand(1.0);
-							);
+							~balance.set(\val, 0.rrand(1.0));
+							~fx1.set(\rezFreq, 400.rrand(1000));
 						});
 					}, chan:2);
 
 				)
 			},
-			3,{">>>>>>>>>>>>SECTION 3".postln},
+			3,{">>>>>>>>>>>>SECTION 3".postln;
+
+
+
+
+			},
 
 
 			4,{">>>>>>>>>>>>SECTION 4".postln},
