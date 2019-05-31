@@ -59,6 +59,13 @@ s.waitForBoot({
 		Out.ar(out, sig);
 	}).add;
 
+	SynthDef(\comb,{arg freq=1/10000, in=0, out=0;
+		var sig = In.ar(in,1);
+		sig = sig + CombC.ar(sig,0.1,freq,0.1);
+		sig = Compander.ar(sig,In.ar(4,2),0.1,1,0.25,0.1,0.01);
+		Out.ar(out, sig);
+	}).add;
+
 
 
 	// make a DC synth (the DC ugen doesn't allow modulation)
@@ -93,12 +100,23 @@ s.waitForBoot({
 
 	~distoBus = Bus.audio(s, 1);
 
+	~combBus = Bus.audio(s, 1);
+
+
 	// FX Synths
 	~rez0 = Synth.after(~in0, \rez, [\in,  ~rezBus0, \out, 0]);
 	~rez1 = Synth.after(~in1, \rez, [\in,  ~rezBus1, \out, 1]);
 	~rez2 = Synth.after(~in2, \rez, [\in,  ~rezBus2, \out, 2]);
 
 	~disto = Synth.after(~in0, \cross, [\in,  ~distoBus, \out, 3]);
+
+	~comb = Synth.after(~in2, \comb, [\in,  ~combBus, \out, 3]);
+
+	// ~comb.free
+	// ~in2.set(\out, ~combBus);
+	// ~combBus.set(\freq, 1/8)
+
+	// TEST
 
 
 	// set effects or not on individual drum inputs
@@ -159,6 +177,10 @@ s.waitForBoot({
 					~in0.set(\out, ~distoBus);
 					~in1.set(\out, ~distoBus);
 					~in2.set(\out, ~distoBus);
+
+				},
+				4, {
+					~in2.set(\out, ~combBus);
 
 				},
 			);
@@ -368,7 +390,10 @@ s.waitForBoot({
 				});
 
 			},
-			4, {},
+			4, {
+
+				// ~comb.set(\freq, val.linlin(0, 127, 1/100, 1/100));
+			},
 			5, {},);
 
 	});
