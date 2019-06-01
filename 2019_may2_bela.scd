@@ -59,12 +59,25 @@ SynthDef(\noise, {|freq=1000|
 }).add;
 
 
-SynthDef(\bip,
-	{
-		|amp=0.1, freq=1000, out=0|
-		var sig;
-		sig = SinOsc.ar(freq:freq, mul: EnvGen.ar(Env.perc(0.001, level:amp), doneAction:2));
-		Out.ar(out, sig);
+SynthDef(\beep, {|out=0, freq=3400|
+	var sig;
+	sig = EnvGen.ar(Env.perc(releaseTime:1), doneAction:2);
+	sig = Ringz.ar(sig, freq, 1);
+	Out.ar(out, sig);
+}).add;
+
+SynthDef(\reverb, {|in=0, out=0, dec=5|
+	var s, z, y;
+	s = In.ar(in, 1);
+	// reverb predelay time :
+	z = DelayN.ar(s, 0.048);
+	// 7 length modulated comb delays in parallel :
+	y = Mix.ar(Array.fill(7,{ CombL.ar(z, 0.1, LFNoise1.kr(0.1.rand, 0.04, 0.05), dec) }));
+	// two parallel chains of 4 allpass delays (8 total) :
+	7.do({ y = AllpassN.ar(y, 0.050, [0.050.rand, 0.050.rand],1) });
+	// add original sound to reverb and play it :
+	s = s+(0.2*y);
+	Out.ar(out, s);
 }).add;
 
 )
@@ -78,13 +91,15 @@ MIDIdef.freeAll;
 (
 
 ~fxBus1 = Bus.audio(s, 1);
-// ~fxBus2 = Bus.audio(s, 2);
+~revBus = Bus.audio(s, 1);
 
 ~in0 = Synth(\mic, [\in, 0, \out, 0]);
 ~in1 = Synth(\mic, [\in, 1, \out, 1]);
 ~in2 = Synth(\mic, [\in, 2, \out, 2]);
 ~in3 = Synth(\mic, [\in, 3, \out, 3]);
 ~fx1 = Synth.after(~in1, \fx1, [\in,  ~fxBus1, \out, 1]);
+
+~reverb = Synth(\reverb, [\in, ~revBus, \out, 0, \dec, 5]);
 
 ~pitch = Synth(\dc, [\out, 2]);
 ~decay = Synth(\dc, [\out, 3]);
@@ -221,7 +236,7 @@ MIDIdef.program(\section, {|val|
 							~balance.set(\val, 0.rrand(1.0));
 							~fx1.set(\rezFreq, 400.rrand(10000));
 							if (~hatCount%3 == 0, {
-								Synth(\bip, [\out, 2, \freq, 2000, \amp, 0.1]);});
+								Synth(\beep, [\out, ~revBus, \freq, 3400]);});
 						});
 					}, chan:2);
 
