@@ -19,7 +19,7 @@ SynthDef(\mic, {
 }).add;
 
 // distortion
-SynthDef(\fx1,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, rezFreq=400, in=0, out=0|
+SynthDef(\disto,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, rezFreq=400, in=0, out=0|
 
 	var sig = In.ar(in,1);
 
@@ -48,20 +48,20 @@ SynthDef(\dc, {|val=0, out=2|
 	AnalogOut.ar(out, SinOsc.ar(0, add:val));
 }).add;
 
-SynthDef(\noise, {|freq=1000|
+SynthDef(\noise, {|freq=1000, out=0|
 	var mod, sig, sig2;
 	mod = SinOsc.ar(0.1, mul:300);
 	sig = PinkNoise.ar(0.5);
 	sig = HPF.ar(sig, freq:800 + mod);
 	freq = 	(freq  + mod).clip(1, 10000);
 	sig2 = BPF.ar(sig, freq: freq);
-	Out.ar(0, [sig, sig2]);
+	Out.ar(out, [sig, sig2]);
 }).add;
 
 
-SynthDef(\beep, {|out=0, freq=3400|
+SynthDef(\beep, {|out=0, freq=3400, rel=1|
 	var sig;
-	sig = EnvGen.ar(Env.perc(releaseTime:1), doneAction:2);
+	sig = EnvGen.ar(Env.perc(releaseTime:rel), doneAction:2);
 	sig = Ringz.ar(sig, freq, 1);
 	Out.ar(out, sig);
 }).add;
@@ -80,6 +80,15 @@ SynthDef(\reverb, {|in=0, out=0, dec=5|
 	Out.ar(out, s);
 }).add;
 
+SynthDef(\rezo, {|in=0, out=0, freq=100, dec=0.1|
+	var sig, fx;
+	sig = In.ar(in, 1);
+	fx = Ringz.ar(sig, freq, decaytime:dec);
+	sig = sig + (0.2*fx);
+	Out.ar(out, sig);
+}).add;
+
+
 )
 (
 s.freeAll;
@@ -90,16 +99,18 @@ MIDIdef.freeAll;
 
 (
 
-~fxBus1 = Bus.audio(s, 1);
+~distoBus = Bus.audio(s, 1);
 ~revBus = Bus.audio(s, 1);
+~rezoBus = Bus.audio(s, 1);
 
 ~in0 = Synth(\mic, [\in, 0, \out, 0]);
 ~in1 = Synth(\mic, [\in, 1, \out, 1]);
 ~in2 = Synth(\mic, [\in, 2, \out, 2]);
 ~in3 = Synth(\mic, [\in, 3, \out, 3]);
-~fx1 = Synth.after(~in1, \fx1, [\in,  ~fxBus1, \out, 1]);
 
+~disto = Synth.after(~in1, \disto, [\in,  ~distoBus, \out, 1]);
 ~reverb = Synth(\reverb, [\in, ~revBus, \out, 0, \dec, 5]);
+~rezo = Synth(\rezo, [\in, ~rezoBus, \out, 0]);
 
 ~pitch = Synth(\dc, [\out, 2]);
 ~decay = Synth(\dc, [\out, 3]);
@@ -116,7 +127,7 @@ MIDIdef.freeAll;
 
 // s.freeAll
 
-// ~fx1.free
+// ~disto.free
 
 
 (
@@ -189,16 +200,16 @@ MIDIdef.program(\section, {|val|
 					~overtone.set(\val, 1);
 
 					// distortion
-					~in1.set(\out, ~fxBus1);
-					~in2.set(\out, ~fxBus1);
+					~in1.set(\out, ~distoBus);
+					~in2.set(\out, ~distoBus);
 					~in0.set(\out, 0);
 					~in3.set(\out, 3);
 
 
 
-					~fx1.set(\amp, 1);
-					~fx1.set(\filterFreq, 1000);
-					~fx1.set(\smooth, 0.9);
+					~disto.set(\amp, 1);
+					~disto.set(\filterFreq, 1000);
+					~disto.set(\smooth, 0.9);
 
 
 					MIDIdef.noteOn(\kick, {|val|
@@ -219,7 +230,7 @@ MIDIdef.program(\section, {|val|
 							~decay.set(\val, 0.0);
 							if(~noiseOn==True, {}, {
 								~hatCount = 0;
-								~noise=Synth(\noise);
+								~noise=Synth(\noise, [\out, ~distoBus]);
 								~noiseOn = True;}
 							);
 						});
@@ -234,7 +245,7 @@ MIDIdef.program(\section, {|val|
 							~pitch.set(\val, 0.07);
 							~decay.set(\val, 0.3);
 							~balance.set(\val, 0.rrand(1.0));
-							~fx1.set(\rezFreq, 400.rrand(10000));
+							~disto.set(\rezFreq, 400.rrand(10000));
 							if (~hatCount%3 == 0, {
 								Synth(\beep, [\out, ~revBus, \freq, 3400]);});
 						});
@@ -244,13 +255,165 @@ MIDIdef.program(\section, {|val|
 			},
 			3,{">>>>>>>>>>>>SECTION 3".postln;
 
+				(
+
+					~pitch.set(\val, 0.1);
+					~decay.set(\val, 0.3);
+					~balance.set(\val, 1);
+					~overtone.set(\val, 1);
+
+					// distortion
+					~in0.set(\out, ~distoBus);
+					~in1.set(\out,1);
+					~in2.set(\out, ~distoBus);
+					~in3.set(\out, ~distoBus);
+
+
+
+					~disto.set(\amp, 1);
+					~disto.set(\filterFreq, 1000);
+					~disto.set(\smooth, 0.9);
+
+
+					MIDIdef.noteOn(\kick, {|val|
+						// val.postln;
+						if(val>0,{
+							~pitch.set(\val, 0.2);
+
+							~decay.set(\val, 0.4);
+							if(~noiseOn==True,{~noise.free; ~noiseOn=False}, {});
+						});
+					}, chan:0);
+
+
+					MIDIdef.noteOn(\snare, {|val|
+						// val.postln;
+						if(val>0,{
+							~pitch.set(\val, 0.05);
+							~decay.set(\val, 0.0);
+							if(~noiseOn==True, {}, {
+								~hatCount = 0;
+								~noise=Synth(\noise, [\out, ~rezoBus]);
+								~rezo.set(\freq, 1200);
+								~noiseOn = True;}
+							);
+						});
+					}, chan:1);
+
+
+					MIDIdef.noteOn(\hat, {|val|
+						// val.postln;
+						if(val>0,{
+							~hatCount = ~hatCount + 1;
+							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
+							~pitch.set(\val, 0.07);
+							~decay.set(\val, 0.3);
+							~balance.set(\val, 0.rrand(1.0));
+							~disto.set(\rezFreq, 400.rrand(10000));
+							// Synth(\beep, [\out, 2, \rel, 0.05, \freq, 3000]);
+
+
+							if (~hatCount%3 == 0, {
+								Synth(\beep, [\out, 1, \rel, 0.05, \freq, 3400]);},
+							{
+
+								Synth(\beep, [\out, 2, \rel, 0.05.rrand(0.1), \freq, 3200]);
+							}
+
+
+							);
+						},
+
+						);
+					}, chan:2);
+
+				)
+			},
+
+
+
+
+
+			4,{">>>>>>>>>>>>SECTION 4".postln;
+
+
+				(
+
+					~pitch.set(\val, 0.1);
+					~decay.set(\val, 0.3);
+					~balance.set(\val, 1);
+					~overtone.set(\val, 1);
+
+					// distortion
+					~in0.set(\out, ~distoBus);
+					~in1.set(\out,1);
+					~in2.set(\out, ~distoBus);
+					~in3.set(\out, 3);
+
+
+
+					~disto.set(\amp, 1);
+					~disto.set(\filterFreq, 1000);
+					~disto.set(\smooth, 0.9);
+
+
+					MIDIdef.noteOn(\kick, {|val|
+						// val.postln;
+						if(val>0,{
+							~pitch.set(\val, 0.1);
+
+							~decay.set(\val, 0.4);
+							if(~noiseOn==True,{~noise.free; ~noiseOn=False}, {});
+						});
+					}, chan:0);
+
+
+					MIDIdef.noteOn(\snare, {|val|
+						// val.postln;
+						if(val>0,{
+							~pitch.set(\val, 0.05);
+							~decay.set(\val, 0.0);
+							if(~noiseOn==True, {}, {
+								~noise=Synth(\noise, [\out, ~rezoBus]);
+								~rezo.set(\freq, 800);
+								~hatCount = 0;
+								~noiseOn = True;}
+							);
+						});
+					}, chan:1);
+
+
+					MIDIdef.noteOn(\hat, {|val|
+						// val.postln;
+						if(val>0,{
+							~hatCount = ~hatCount + 1;
+							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
+							~pitch.set(\val, 0.07);
+							~decay.set(\val, 0.3);
+							~balance.set(\val, 0.rrand(1.0));
+							~disto.set(\rezFreq, 400.rrand(10000));
+							// Synth(\beep, [\out, 2, \rel, 0.05, \freq, 3000]);
+
+
+							if (~hatCount%3 == 0, {
+								Synth(\beep, [\out, 1, \rel, 0.05, \freq, 3400]);},
+							{
+
+								Synth(\beep, [\out, 2, \rel, 0.05.rrand(0.1), \freq, 3200]);
+							}
+
+
+							);
+						},
+
+						);
+					}, chan:2);
+
+				)
 
 
 
 			},
-
-
-			4,{">>>>>>>>>>>>SECTION 4".postln},
 
 
 			5,{">>>>>>>>>>>>SECTION 5".postln},
