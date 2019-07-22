@@ -39,12 +39,12 @@ s.waitForBoot({
 	~cues[0,0] = {
 		if(~debug) {postf("CUE: 0 - 0 \n")};
 
-		~arp1 = Synth(\arp);
-		NodeWatcher.register(~arp1, true)
-
-		~arp1.isRunning
-		~arp1.isPlaying
-		~arp1.free
+		// ~arp1 = Synth(\arp);
+		// NodeWatcher.register(~arp1, true)
+		//
+		// ~arp1.isRunning
+		// ~arp1.isPlaying
+		// ~arp1.free
 
 
 	};
