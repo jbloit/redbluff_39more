@@ -1,5 +1,5 @@
 
-s.latency = 0.2;
+s.latency = 0.8;
 s.reboot;
 
 
@@ -7,7 +7,7 @@ s.reboot;
 (
 
 MIDIClient.init;
-m = MIDIOut(1).latency = 0.2;
+m = MIDIOut(1).latency = 0.8;
 
 
 // for sequencing to a synth and to a midi device at the same time
@@ -18,7 +18,7 @@ Event.addEventType(\midisynth, { |server|
 
 
 
-t = TempoClock.tempo = 60/60;
+t = TempoClock.tempo = 70/60;
 
 ~fxBus0 = Bus.audio(s, 1);
 ~fxBus1 = Bus.audio(s, 1);
@@ -32,7 +32,7 @@ SynthDef(\sampler, {
 	var sig, sigfilt, env;
 	sig = PlayBuf.ar(1, bufnum, rate * BufRateScale.kr(bufnum));
 	env = EnvGen.ar(Env.adsr, gate, doneAction:2);
-	sig = sig * env;
+	sig = sig * env * amp;
 	sigfilt = BPF.ar(sig, timbre.clip(0,1).linexp(0, 1, 100, 10000), 0.3);
 	sig = Mix.ar([sig*0.5, sigfilt*0.9]);
 	// sig = Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0));
@@ -56,6 +56,7 @@ SynthDef(\sampler, {
 ~hatBuffers= Array.newClear(3);
 ~hatBuffers[0] = Buffer.read(s, ~samplesDir +/+ "hat_spanky.wav" );
 ~hatBuffers[1] = Buffer.read(s, ~samplesDir +/+ "hat_spanky_rez.wav" );
+
 ~hatBuffers[2] = Buffer.read(s, ~samplesDir +/+ "hat_crashcourse.wav" );
 
 ~tomBuffers= Array.newClear(3);
@@ -69,6 +70,7 @@ SynthDef(\sampler, {
 ////////////////////////////////////  PATTERNS
 
 (
+// KICK
 Pdef(\p,
 	Pbind(
 		\type, \midisynth,
@@ -79,7 +81,7 @@ Pdef(\p,
 		\pan, 1,
 		\timbre, 0,
 		\bufnum, 2,
-		\amp, Pseq([0.01, 0.1], inf),
+		\amp, 1,
 		\out, 0,
 
 		// midi
@@ -90,9 +92,7 @@ Pdef(\p,
 		\legato, Pwhite(0.1, 1),
 		\octave, 1,
 ));
-)
-
-(
+// SNARE
 Pdef(\q,
 	Pbind(
 		\type, \midisynth,
@@ -103,7 +103,7 @@ Pdef(\q,
 		\pan, 1,
 		\timbre, 0,
 		\bufnum, 4,
-		\amp, 0.01,
+		\amp, 0.3,
 		\out, 1,
 
 		// midi
@@ -114,6 +114,31 @@ Pdef(\q,
 		\legato, Pwhite(0.1, 1),
 		\octave, 1,
 ));
+// HAT
+Pdef(\r,
+	Pbind(
+
+		\type, \midisynth,
+
+		// synth
+		\instrument, \sampler,
+		\dur, Pseq([1/8], inf),
+		\pan, 0.5,
+		// \timbre, Pseq([0,0.5, 0.8, 0.2, 1], inf),
+		\bufnum, 6,
+		// \amp, Pseq((0..3)/20.0, inf),
+		\out, 2,
+
+
+		// midi
+		\midicmd, \noteOn,
+		\midiout, m,
+		\chan, 2,
+		\note, 0,
+		\legato, Pwhite(0.1, 1),
+		\octave, 1,
+
+));
 )
 
 
@@ -122,13 +147,102 @@ Pdef(\q,
 (
 Pdef(\p).play(quant:1);
 Pdef(\q).play(quant:1);
+Pdef(\r).play(quant:1);
 )
+
+////////////////// 2
+
+
+(
+// KICK
+Pdef(\p,
+	Pbind(
+		\type, \midisynth,
+
+		// synth
+		\instrument, \sampler,
+		\dur, Pseq([1/4, Rest(1/2)], inf),
+		\pan, 1,
+		\timbre, 0,
+		\bufnum, 2,
+		\amp, 1,
+		\out, 0,
+
+		// midi
+		\midicmd, \noteOn,
+		\midiout, m,
+		\chan, 0,
+		\note, 0,
+		\legato, Pwhite(0.1, 0.9),
+		\octave, 1,
+));
+// SNARE
+Pdef(\q,
+	Pbind(
+		\type, \midisynth,
+
+		// synth
+		\instrument, \sampler,
+		\dur, Pseq([Rest(0.5), 2, 1/8, 1/4], inf),
+		\pan, 1,
+		\timbre, 0,
+		\bufnum, 4,
+		\amp, 0.3,
+		\out, 1,
+
+		// midi
+		\midicmd, \noteOn,
+		\midiout, m,
+		\chan, 1,
+		\note, 0,
+		\legato, Pwhite(0.1, 0.9),
+		\octave, 1,
+));
+// HAT
+Pdef(\r,
+	Pbind(
+
+		\type, \midisynth,
+
+		// synth
+		\instrument, \sampler,
+		\dur, Pseq([1/8], inf),
+		\pan, 0.5,
+		// \timbre, Pseq([0,0.5, 0.8, 0.2, 1], inf),
+		\bufnum, 6,
+		// \amp, Pseq((0..3)/20.0, inf),
+		\out, 2,
+
+
+		// midi
+		\midicmd, \noteOn,
+		\midiout, m,
+		\chan, 2,
+		\note, 0,
+		\legato, Pwhite(0.1, 0.9),
+		\octave, 1,
+
+));
+)
+
+
+
+
+
+
+
+
+
+
 
 ///// STOP
 (
 Pdef(\p).stop;
 Pdef(\q).stop;
+Pdef(\r).stop;
 m.allNotesOff(0);
+
+
 m.allNotesOff(1);
 
 )

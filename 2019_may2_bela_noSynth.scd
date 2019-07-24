@@ -3,6 +3,8 @@ MIDIIn.connectAll;
 MIDIFunc.trace(false);
 
 
+// a version without the analog synth
+
 //when running from laptop:
 (
 Server.default = s = Server("belaServer", NetAddr("192.168.7.2", 57110));
@@ -45,7 +47,13 @@ SynthDef(\disto,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, rezFreq=4
 
 // make a DC synth (the DC ugen doesn't allow modulation)
 SynthDef(\dc, {|val=0, out=2|
-	AnalogOut.ar(out, SinOsc.ar(0, add:val));
+	Out.ar(out, SinOsc.ar(0, add:val));
+}).add;
+
+
+SynthDef(\bass, {|out=0, freq=100, amp=0.3|
+	var sig = SinOsc.ar(freq, mul: amp);
+	Out.ar(out, sig!2)
 }).add;
 
 SynthDef(\noise, {|freq=1000, out=0|
@@ -122,7 +130,13 @@ MIDIdef.freeAll;
 ~noiseFreq = 1000;
 ~noiseFreqInc = 400;
 ~hatCount=0;
+
+~bass;
+~bassOn=False;
+~bassFreq = 50;
 )
+
+
 
 
 // s.freeAll
@@ -140,10 +154,7 @@ MIDIdef.program(\section, {|val|
 
 				(
 
-					~pitch.set(\val, 0.1);
-					~decay.set(\val, 0.3);
-					~balance.set(\val, 1);
-					~overtone.set(\val, 1);
+
 					~in0.set(\out, 0);
 					~in1.set(\out, 1);
 					~in2.set(\out, 2);
@@ -153,8 +164,14 @@ MIDIdef.program(\section, {|val|
 					MIDIdef.noteOn(\kick, {|val|
 						// val.postln;
 						if(val>0,{
-							~decay.set(\val, 0.4);
 							if(~noiseOn==True,{~noise.free; ~noiseOn=False}, {});
+
+
+							if(~bassOn==True, {}, {
+								~bass=Synth(\bass, [\freq, ~bassFreq]);
+								~bassOn = True;}
+							);
+
 						});
 					}, chan:0);
 
@@ -162,8 +179,10 @@ MIDIdef.program(\section, {|val|
 					MIDIdef.noteOn(\snare, {|val|
 						// val.postln;
 						if(val>0,{
-							~pitch.set(\val, 0.05);
-							~decay.set(\val, 0.0);
+
+
+							if(~bassOn==True,{~bass.free; ~bassOn=False}, {});
+
 							if(~noiseOn==True, {}, {
 								~hatCount = 0;
 								~noise=Synth(\noise);
@@ -178,8 +197,8 @@ MIDIdef.program(\section, {|val|
 						if(val>0,{
 							~hatCount = ~hatCount + 1;
 							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
-							~pitch.set(\val, 0.07);
-							~decay.set(\val, 0.3);
+							~bass.set(\freq, ~bassFreq+10);
+
 							~balance.set(\val, 0.rrand(1.0);
 							);
 						});
@@ -416,7 +435,7 @@ MIDIdef.program(\section, {|val|
 			},
 
 
-			5,{">>>>>>>>>>>>sdfSECTION 5".postln},
+			5,{">>>>>>>>>>>>SECTION 5".postln},
 
 
 		)
