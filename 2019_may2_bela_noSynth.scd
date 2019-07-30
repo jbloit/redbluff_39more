@@ -3,6 +3,7 @@ MIDIIn.connectAll;
 MIDIFunc.trace(false );
 
 s.options.outDevice = "USB PnP Sound Device";
+s.options.inDevice = "Soundflower (16ch)";
 // {SinOsc.ar()}.play
 
 // a version without the analog synth
@@ -16,10 +17,10 @@ s.startAliveThread;
 
 (
 SynthDef(\mic, {
-	|in=0, out=0|
+	|in=0, out=0, amp=1|
 	var sig;
 	sig = SoundIn.ar(in);
-	Out.ar(out, sig);
+	Out.ar(out, sig*amp);
 }).add;
 
 // distortion
@@ -62,7 +63,7 @@ SynthDef(\dc, {|val=0, out=2|
 ~buf[1].loadCollection(~wt1.asWavetable);
 
 
-SynthDef(\bass, {|out=0, buf=0, numBufs=2, freq=300, amp=0.2|
+SynthDef(\bass, {|out=0, buf=0, numBufs=2, freq=300, amp=0.1|
 	var sig, bufpos, detuneSig;
 	detuneSig = LFNoise1.kr(0.2!8).bipolar(0.2).midiratio;
 	bufpos = buf + MouseX.kr(0, numBufs-1);
@@ -135,8 +136,8 @@ MIDIdef.freeAll;
 
 ~in0 = Synth(\mic, [\in, 0, \out, 0]);
 ~in1 = Synth(\mic, [\in, 1, \out, 1]);
-~in2 = Synth(\mic, [\in, 2, \out, 2]);
-~in3 = Synth(\mic, [\in, 3, \out, 3]);
+~in2 = Synth(\mic, [\in, 2, \out, 0]);
+~in3 = Synth(\mic, [\in, 3, \out, 1]);
 
 ~disto = Synth.after(~in1, \disto, [\in,  ~distoBus, \out, 1]);
 ~reverb = Synth(\reverb, [\in, ~revBus, \out, 0, \dec, 5]);
@@ -177,11 +178,11 @@ MIDIdef.program(\section, {|val|
 
 				(
 
-					//
-					// ~in0.set(\out, 0);
-					// ~in1.set(\out, 1);
-					// ~in2.set(\out, 2);
-					// ~in3.set(\out, 3);
+
+					~in0.set(\out, 0, \amp, 40);
+					~in1.set(\out, 1, \amp, 40);
+					~in2.set(\out, 0, \ap, 80);
+					~in3.set(\out, 1);
 
 
 					MIDIdef.noteOn(\kick, {|val|
@@ -192,7 +193,7 @@ MIDIdef.program(\section, {|val|
 
 							if(~bassOn==True, {}, {
 								// ~bass=Synth(\bass, [\freq, ~bassFreq, \rez, ~bassRez]);
-								~bass = Synth(\bass, [\freq, ~bassFreq, \buf, ~buf[0].bufnum , \numBufs, 2, \amp, 1]);
+								~bass = Synth(\bass, [\freq, ~bassFreq, \buf, ~buf[0].bufnum , \numBufs, 2, \amp, 0.2]);
 								~bassOn = True;}
 							);
 
@@ -239,23 +240,20 @@ MIDIdef.program(\section, {|val|
 			2,{">>>>>>>>>>>>SECTION 2".postln;
 				(
 
-					~pitch.set(\val, 0.1);
+/*					~pitch.set(\val, 0.1);
 					~decay.set(\val, 0.3);
 					~balance.set(\val, 1);
-					~overtone.set(\val, 1);
+					~overtone.set(\val, 1);*/
 
 					// distortion
+					~in0.set(\out, 0);
 					~in1.set(\out, ~distoBus);
 					~in2.set(\out, ~distoBus);
-					~in0.set(\out, 0);
 					~in3.set(\out, 3);
-
-
 
 					~disto.set(\amp, 1);
 					~disto.set(\filterFreq, 1000);
 					~disto.set(\smooth, 0.9);
-
 
 					MIDIdef.noteOn(\kick, {|val|
 						// val.postln;
