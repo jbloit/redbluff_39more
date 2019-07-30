@@ -1,7 +1,9 @@
 MIDIClient.init;
 MIDIIn.connectAll;
-MIDIFunc.trace(false);
+MIDIFunc.trace(false );
 
+s.options.outDevice = "USB PnP Sound Device";
+// {SinOsc.ar()}.play
 
 // a version without the analog synth
 
@@ -51,10 +53,30 @@ SynthDef(\dc, {|val=0, out=2|
 }).add;
 
 
-SynthDef(\bass, {|out=0, freq=100, amp=0.3|
-	var sig = SinOsc.ar(freq, mul: amp);
-	Out.ar(out, sig!2)
+// bass
+~wt0 = Signal.sineFill(1024, [1, 1, 1, 1, 1, 1, 1]);
+~wt1 = Signal.chebyFill(1024, [0, 1, 0.1, 0, 0, 0.3, 0]);
+
+~buf = Buffer.allocConsecutive(2, s, 2048);
+~buf[0].loadCollection(~wt0.asWavetable);
+~buf[1].loadCollection(~wt1.asWavetable);
+
+
+SynthDef(\bass, {|out=0, buf=0, numBufs=2, freq=300, amp=0.2|
+	var sig, bufpos, detuneSig;
+	detuneSig = LFNoise1.kr(0.2!8).bipolar(0.2).midiratio;
+	bufpos = buf + MouseX.kr(0, numBufs-1);
+	sig = VOsc.ar(bufpos, freq);
+	sig = Splay.ar(sig);
+	sig = LeakDC.ar(sig) * amp;
+	Out.ar(out, sig);
 }).add;
+
+
+
+
+
+
 
 SynthDef(\noise, {|freq=1000, out=0|
 	var mod, sig, sig2;
@@ -133,7 +155,8 @@ MIDIdef.freeAll;
 
 ~bass;
 ~bassOn=False;
-~bassFreq = 50;
+~bassFreq = 40;
+~bassRez = 10;
 )
 
 
@@ -154,11 +177,11 @@ MIDIdef.program(\section, {|val|
 
 				(
 
-
-					~in0.set(\out, 0);
-					~in1.set(\out, 1);
-					~in2.set(\out, 2);
-					~in3.set(\out, 3);
+					//
+					// ~in0.set(\out, 0);
+					// ~in1.set(\out, 1);
+					// ~in2.set(\out, 2);
+					// ~in3.set(\out, 3);
 
 
 					MIDIdef.noteOn(\kick, {|val|
@@ -168,7 +191,8 @@ MIDIdef.program(\section, {|val|
 
 
 							if(~bassOn==True, {}, {
-								~bass=Synth(\bass, [\freq, ~bassFreq]);
+								// ~bass=Synth(\bass, [\freq, ~bassFreq, \rez, ~bassRez]);
+								~bass = Synth(\bass, [\freq, ~bassFreq, \buf, ~buf[0].bufnum , \numBufs, 2, \amp, 1]);
 								~bassOn = True;}
 							);
 
@@ -196,11 +220,13 @@ MIDIdef.program(\section, {|val|
 						// val.postln;
 						if(val>0,{
 							~hatCount = ~hatCount + 1;
-							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
-							~bass.set(\freq, ~bassFreq+10);
+							if (~noiseOn==True, {~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);});
+							if(~bassOn==True, {
+								~bass.set(\freq, ~bassFreq+3, \buf, ~buf[0].bufnum + 0.5);
 
-							~balance.set(\val, 0.rrand(1.0);
-							);
+							});
+
+
 						});
 					}, chan:2);
 
