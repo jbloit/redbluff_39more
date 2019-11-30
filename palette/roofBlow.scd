@@ -46,5 +46,3 @@ play{
 	a=Saw;
 	Splay.ar(Formant.ar(a.ar((5,7..15)*MouseX.kr(9, 30))*MouseY.kr(19, 1059)+MouseX.kr(99, 299), bwfreq:a.ar((1,3..13)*MouseY.kr(30, 300))*MouseY.kr(19, 1059)+MouseX.kr(99, 299), mul: 0.3))}//#SuperCollider
 
-
-

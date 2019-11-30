@@ -906,8 +906,8 @@ d = Synth(\cross);
 
 
 (
-Pdef(\p2s7).stop;
-Pdef(\p2s8).play;
+Pdef(\p2s9).stop;
+Pdef(\p2s10).play;
 )
 
 
