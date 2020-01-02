@@ -27,7 +27,7 @@ Ndef(\blip, { |freq = 30, numHarm = 10|
 
 Ndef(\blip).play(2, 1);
 Ndef(\blip).set(\freq, 70, \numHarm, 1); // tone
-Ndef(\blip).set(\freq, 70, \numHarm, 90); // buzz
+Ndef(\blip).set(\freq, 70, \numHarm, 60); // buzz
 Ndef(\blip).set(\freq, 3, \numHarm, 90); // pulses
 Ndef(\blip).set(\freq, 10, \numHarm, 90); //pulses
 Ndef(\blip).set(\freq, 10, \numHarm, 30); //pulses
@@ -37,30 +37,58 @@ Ndef(\blip).stop;
 
 // ------------------------------------------------------------------------ Roof
 
-// Ndef(\roof, {|x=200, y=100|
-// 	a=Saw;
-// 	x = x.linlin(0, 1, 100, 400);
-// 	y = y.linlin(0, 1, 100, 400);
-// 	Splay.ar(Formant.ar(a.ar((5,7..15)*19)*99+x, bwfreq:a.ar((3,5..11)*a.ar(3,2,3))*299+y))/3;
-// });
 
+// HARSH
+(
+Ndef(\roof, {|x=200, y=100|
+	a=Saw;
+	x = x.linlin(0, 1, 100, 400);
+	y = y.linlin(0, 1, 100, 400);
+	Splay.ar(Formant.ar(a.ar((5,7..15)*19)*99+x, bwfreq:a.ar((3,5..11)*a.ar(3,2,3))*299+y))/3;
+});
+)
 
+// SOFT
+(
 Ndef(\roof, {|x=0.3, y=0.4|
 	a=Saw;
 	x = x.linlin(0, 1, 100, 400);
 	y = y.linlin(0, 1, 100, 400);
 	Splay.ar(Formant.ar(Saw.kr((5,7..15)*30)*x+y, Saw.kr((1,3..13)*29)*x+y, Saw.kr((3,5..11)*Saw.kr(3,2,3))*x+y, mul:0.1));
-
 });
+)
 
+// FULLER
+(
+	Ndef(\roof, {|x=0.3, y=0.4|
+		a=Saw;
+
+		x = x.linlin(0, 1, 100, 400);
+		y = y.linlin(0, 1, 100, 400);
+		Splay.ar(Formant.ar(a.ar((5,7..15)*19)*99+x, a.ar((1,3..13)*29)*199+x, a.ar((3,5..11)*a.ar(3,2,3))*299+y))/3;
+	});
+)
 
 Ndef(\roof).play(0, 2);
+Ndef(\roof).stop;
 Ndef(\roof).set(\x, 0.1, \y, 0.8);
-Ndef(\roof).set(\x, 0.4, \y, 0.2);
+Ndef(\roof).set(\x, 0.1, \y, 0.5);
+Ndef(\roof).set(\x, 0.1, \y, 0.3);
+Ndef(\roof).set(\x, 0.4, \y, 0.3);
+Ndef(\roof).set(\x, 0.4, \y, 0.1);
+Ndef(\roof).set(\x, 0.8, \y, 0.1);
+Ndef(\roof).map(\x, ~b2);
+
 Ndef(\roof).stop;
 
-Ndef(\fo2, {Blip.ar(3, 2, 0.5, 0.5)});
+Ndef(\fo2, {Blip.ar(1, 20, 0.5, 0.5)});
+Ndef(\fo3, {BlitB3Square.ar(5)*14});
+Ndef(\fo4, {BlitB3Saw.ar(6)});
+
+
 Ndef(\roof).map(\x, Ndef(\fo2).play(5, 2));
+Ndef(\roof).map(\y, Ndef(\fo3).play(5, 2));
+Ndef(\roof).stop;
 
 
 

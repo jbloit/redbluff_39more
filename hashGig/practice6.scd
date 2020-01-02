@@ -1,4 +1,4 @@
-// hash practice 4
+// hash practice
 
 (
 Server.default = s = Server("belaServer", NetAddr("192.168.7.2", 57110));
@@ -13,12 +13,11 @@ Bus.clear;
 
 
 // Ndef to Ndef
-// asmr
 // pulse
 // roofblow
 
 
-
+s.freeAll
 
 // Analog out
 (
@@ -36,10 +35,11 @@ SynthDef(\dc, {|val=0, out=2|
 
 // check analog outs
 ~o1.set(\val, 0.1)
-~o1.set(\val, 0.2)
+~o1.set(\val, 0.3)
 
 ~o2.set(\val, 0.05)
 ~o2.set(\val, 0.15)
+~o2.set(\val, 1)
 
 ~o3.set(\val, 0.8)
 ~o3.set(\val, 0.1)
@@ -81,7 +81,7 @@ Ndef(\p1, {|freq=7000, detune=0.3, f0=9, f1=2.7, w0=0.98, phasing=0, legato=0.5|
 
 
 (
-Ndef(\p2, {|freq=8000, detune=0.3, f0=9, f1=2.7, w0=0.8, phasing=0.1, legato=0.1|
+Ndef(\p2, {|freq=6000, detune=0.3, f0=9, f1=2.7, w0=0.8, phasing=0.1, legato=0.1|
 	var sig, env, env2, trig, sig2,outSig, rel;
 	trig = Pulse.ar(f0, w0);
 	Out.kr(~b3, Amplitude.kr(trig));
@@ -103,6 +103,7 @@ Ndef(\p2, {|freq=8000, detune=0.3, f0=9, f1=2.7, w0=0.8, phasing=0.1, legato=0.1
 
 Ndef(\p1).play(0,1);
 Ndef(\p2).play(1,1);
+Ndef(\p1).stop
 
 ~o1.map(\val, ~b1);
 ~o1.map(\val, ~b2);
@@ -157,3 +158,4 @@ Ndef(\p1).set(\freq, 90, \f0, 9, \f1, 2.8, \w0, 0.9);
 
 	Ndef(\p1).stop
 	Ndef(\p1).play
+s.freeAll
