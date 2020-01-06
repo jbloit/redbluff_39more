@@ -1,6 +1,17 @@
 // INSPIRATION : Marco Goecke
 
+
 (
+SynthDef(\kick, {|out=0, amp=1|
+	var sig, envFreq, env;
+	envFreq = EnvGen.kr(Env([1, 0.1, 0], [0.1, 0.3], -6), doneAction:2, levelScale:380, levelBias:10);
+	env = EnvGen.kr(Env([1, 1, 0], [0.1, 0.3]), levelScale:0.4);
+	sig = LFPar.ar(envFreq, mul:env) ;
+	Out.ar(out, Splay.ar(sig));
+}).add;
+
+
+
 ~b1 = Bus.control(s, 1);
 ~b2 = Bus.control(s, 1);
 
@@ -8,7 +19,7 @@
 Ndef(\p1, {|freq=4000, detune=0.3, f0=6.5, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=0.1|
 	var sig, env, env2, trig, sig2,outSig, rel;
 	trig = Pulse.ar(f0, w0);
-	Out.kr(~b1, Amplitude.kr(trig));
+	Out.kr(~b1, Amplitude.k<r(trig));
 	rel = SinOsc.ar(f1, 0, 1, legato);
 	Out.kr(~b2, Amplitude.kr(rel));
 	env = EnvGen.ar(Env.adsr(releaseTime:rel), trig);
