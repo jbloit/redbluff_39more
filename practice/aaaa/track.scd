@@ -11,6 +11,15 @@ Tdef(\track1, {
 			\amp, Pseq([0.4], inf),
 		)
 	).play;
+
+	Pdef(\snare,
+		Pbind(\instrument, \noise,
+			\dur, Pseq([1/3], inf),
+			\amp, Pseq([0.4], inf),
+		)
+	).play;
+
+
 	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
 	4.wait;
 

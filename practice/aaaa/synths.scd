@@ -41,6 +41,20 @@ Ndef(\roof, {|x=0.3, y=0.4, amp=0.5|
 });
 
 Ndef(\lfo, {LFTri.ar(1.2,mul:0.5, add:0.1)}).play(4,0);
+
+SynthDef(\noise, {|freq=1000, out=0, gate=1|
+	var mod, sig, sig2, env;
+	env = EnvGen.kr(Env.adsr(), doneAction:2, gate:gate);
+	mod = SinOsc.ar(0.1, mul:300);
+	sig = PinkNoise.ar(0.5);
+	sig = HPF.ar(sig, freq:800 + mod);
+	freq = 	(freq  + mod).clip(1, 10000);
+	sig2 = BPF.ar(sig, freq: freq);
+	Out.ar(out, [sig, sig2]);
+}).add;
+
+
+
 )
 
 // Cues. Try to make them stateless.
