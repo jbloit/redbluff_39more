@@ -1,16 +1,5 @@
-// INSPIRATION : Marco Goecke
-
 
 (
-SynthDef(\kick, {|out=0, amp=1|
-	var sig, envFreq, env;
-	envFreq = EnvGen.kr(Env([1, 0.1, 0], [0.1, 0.3], -6), doneAction:2, levelScale:380, levelBias:10);
-	env = EnvGen.kr(Env([1, 1, 0], [0.1, 0.3]), levelScale:0.4);
-	sig = LFPar.ar(envFreq, mul:env) ;
-	Out.ar(out, Splay.ar(sig));
-}).add;
-
-
 
 ~b1 = Bus.control(s, 1);
 ~b2 = Bus.control(s, 1);
@@ -19,19 +8,29 @@ SynthDef(\kick, {|out=0, amp=1|
 Ndef(\p1, {|freq=4000, detune=0.3, f0=6.5, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=0.1|
 	var sig, env, env2, trig, sig2,outSig, rel;
 	trig = Pulse.ar(f0, w0);
-	Out.kr(~b1, Amplitude.k<r(trig));
+	Out.kr(~b1, Amplitude.kr(trig));
 	rel = SinOsc.ar(f1, 0, 1, legato);
-	Out.kr(~b2, Amplitude.kr(rel));
 	env = EnvGen.ar(Env.adsr(releaseTime:rel), trig);
 	sig = LFPar.ar(freq, mul:0.5);
 	outSig = sig * env * amp;
 });
 
+
+SynthDef(\kick, {|out=0, amp=1|
+	var sig, envFreq, env;
+	envFreq = EnvGen.kr(Env([1, 0.1, 0], [0.1, 0.3], -6), doneAction:2, levelScale:380, levelBias:10);
+	env = EnvGen.kr(Env([1, 1, 0], [0.1, 0.3]), levelScale:0.4);
+	sig = LFPar.ar(envFreq, mul:env) * amp;
+	Out.kr(~b2, 1-env);
+	Out.ar(out, Splay.ar(sig));
+}).add;
+
+
 // ROOF DRONE
 Ndef(\roof, {|x=0.3, y=0.4, amp=0.5|
 	var sig;
 	a=Saw;
-	amp.poll;
+	// amp.poll;
 	x = x.linlin(0, 1, 100, 400);
 	y = y.linlin(0, 1, 100, 400);
 	sig = Splay.ar(Formant.ar(a.ar((5,7..15)*19)*99+x, a.ar((1,3..13)*29)*199+x, a.ar((3,5..11)*a.ar(3,2,3))*299+y))/3;
@@ -236,8 +235,102 @@ Ndef(\p1).stop;
 )
 
 
+
+
 (
 Ndef(\roof).stop;
 Ndef(\lfo).stop;
 Ndef(\p1).stop;
 )
+
+
+(
+Tdef(\track1, {
+
+	"::::p1".postln;
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, 0.1).play;
+
+	Pdef(\kick,
+		Pbind(\instrument, \kick,
+			\dur, Pseq(1/(4,6..24), inf),
+			\isRest, Pseq([1, 1, 1, 1, 1, 1, 1, 1], inf).coin.not,
+			\amp, Pseq([0.4], inf),
+		)
+	).play;
+	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	4.wait;
+
+	"::::p2".postln;
+	Pdef(\kick).stop;
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	4.wait;
+
+	"::::p3".postln;
+	Pdef(\kick).stop;
+	Ndef(\lfo, {LFTri.ar(50,mul:0.5, add:0.5)}).play(0,4);
+	4.wait;
+
+	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\lfo, {LFTri.ar(30,mul:0.5, add:0.5)}).play(0,4);
+	4.wait;
+
+
+	"::::p4".postln;
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	Ndef(\lfo).stop();
+	Pdef(\kick).play;
+	4.wait;
+
+
+
+	Ndef(\p1).set(\freq, 2000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.1, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	Ndef(\roof).map(\x, Ndef(\lfo));
+	Ndef(\lfo, {LFTri.ar(50,mul:0.5, add:0.5)}).play(0,4);
+	4.wait;
+
+	Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(4,4);
+	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	4.wait;
+
+
+	Ndef(\p1).set(\freq, 2000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.1, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	Ndef(\roof).map(\x, Ndef(\lfo));
+	Ndef(\lfo, {LFTri.ar(50,mul:0.5, add:0.5)}).play(0,4);
+	4.wait;
+
+
+	Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(4,4);
+	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	4.wait;
+
+
+	Ndef(\p1).set(\freq, 2000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.1, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	Ndef(\roof).map(\x, Ndef(\lfo));
+	Ndef(\lfo, {LFTri.ar(50,mul:0.5, add:0.5)}).play(0,4);
+	4.wait;
+
+	Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(4,4);
+	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	4.wait;
+
+
+	Ndef(\p1).set(\freq, 2000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.1, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
+	Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+	Ndef(\roof).map(\x, ~b2.asMap);
+	Ndef(\lfo).stop();
+
+
+
+	4.wait
+
+
+}).play;
+)
+
+
