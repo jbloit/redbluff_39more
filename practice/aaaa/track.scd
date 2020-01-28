@@ -12,12 +12,16 @@ Tdef(\track1, {
 		)
 	).play;
 
-	Pdef(\snare,
-		Pbind(\instrument, \noise,
-			\dur, Pseq([1/3], inf),
+
+	p =	Pbind(\instrument,  \noise,
+			\dur, 1/4,
+		\freq, 300,
+//			\isRest, Pseq([1, 0], inf).coin.not,
+			\legato, 0.1,
 			\amp, Pseq([0.4], inf),
-		)
-	).play;
+		).play;
+
+	PmonoArt
 
 
 	Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);

@@ -1,84 +1,47 @@
 
+
+// Cues. Try to make them stateless.
+
+
+
+
 (
+Ndef(\mix).play;
 
-~b1 = Bus.control(s, 1);
-~b2 = Bus.control(s, 1);
-~b3 = Bus.control(s, 1);
-~b4 = Bus.control(s, 1);
+TempoClock.tempo = 1;
+
+Pdef(\kick,
+	Pbind(\instrument, \kick,
+		\out, ~o1.index,
+		\dur, Pseq([1], inf),
+		\isRest, Pseq([1, 1, 1, 1, 1, 1, 1, 1], inf).coin.not,
+		\amp, Pseq([0.8], inf),
+	)
+).play(quant:1);
 
 
-~a1 = Bus.audio(s,1);
-~a2 = Bus.audio(s,1);
-
-// PULSE
-Ndef(\p1, {|freq=4000, detune=0.3, f0=6.5, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=0.1|
-	var sig, env, env2, trig, sig2,outSig, rel;
-	trig = Pulse.ar(f0, w0);
-	Out.kr(~b1, Amplitude.kr(trig));
-	rel = SinOsc.ar(f1, 0, 1, legato);
-	env = EnvGen.ar(Env.adsr(releaseTime:rel), trig);
-	sig = LFPar.ar(freq, mul:0.5);
-	outSig = sig * env * amp;
+TempoClock.sched(1, {
+	~p1 = Synth(\p1).set(\freq, 1000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
 });
 
+// SynthDef(\lo, {|freq = 40, amp=0.1, modBus, out=0, modLag=0, modMul = 1|
+~lo = Synth(\lo, [\freq,  50, \modBus, ~k2, \modMul, 0.4, \out, ~o3 ]);
 
-SynthDef(\kick, {|out=0, amp=1|
-	var sig, envFreq, env;
-	envFreq = EnvGen.kr(Env([1, 0.1, 0], [0.1, 0.3], -6), doneAction:2, levelScale:380, levelBias:10);
-	env = EnvGen.kr(Env([1, 1, 0], [0.1, 0.3]), levelScale:0.4);
-	sig = LFPar.ar(envFreq, mul:env) * amp;
-	Out.kr(~b2, env);
-	Out.ar(~a1, sig);
-	Out.ar(out, Splay.ar(sig));
-}).add;
+~lo.set(\modMul, 2);
+~lo.set(\freq, 30);
+~lo.set(\amp, 0.8);
+~lo.set(\modLag, 0);
 
-
-// ROOF DRONE
-Ndef(\roof, {|x=0.3, y=0.4, amp=0.5|
-	var sig;
-	a=Saw;
-	// amp.poll;
-	x = x.linlin(0, 1, 100, 400);
-	y = y.linlin(0, 1, 100, 400);
-	sig = Splay.ar(Formant.ar(a.ar((5,7..15)*19)*99+x, a.ar((1,3..13)*29)*199+x, a.ar((3,5..11)*a.ar(3,2,3))*299+y))/3;
-	sig * amp;
-});
-
-
-Ndef(\lfo, {|freq=1.2|
-	LFTri.ar(freq,mul:0.5, add:0.1)}
-).play(4,0);
-
-SynthDef(\busMod , {|in=0, out=0, mul=1, lag = 0|
-	var sig = In.kr(in, 1);
-	Out.kr(out, sig.lag(lag) * mul );
-	// Out.kr(out, DC.kr(mul) );
-}
-).add;
-
-SynthDef(\noise, {|freq=100, out=0, gate=1|
-	var mod, sig, sig2, env;
-	env = EnvGen.kr(Env.perc(), doneAction:2, gate:gate);
-	mod = SinOsc.ar(0.1, mul:300);
-	sig = PinkNoise.ar(0.5);
-	sig = HPF.ar(sig, freq:800 + mod);
-	freq = 	(freq  + mod).clip(1, 10000);
-	sig2 = BPF.ar(sig, freq: freq);
-	Out.ar(out, [sig, sig2]);
-}).add;
-
-// Synth(\noise, [\gate , 1])
+~roof = Synth(\roof);
+~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 1, \modLag, 0);
 
 )
 
 
-
-// Cues. Try to make them stateless.
-
 (
-Ndef(\p1).set(\freq, 4000, \detune,0.3, \f0,6.5, \f1,2.7, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1).play(0,2);
+~p1.set(\freq, 4000, \detune,0.3, \f0,6.5, \f1,2.7, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1).play(0,2);
 Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
-Ndef(\lfo, {LFTri.ar(1.2,mul:0.5, add:0.1)}).play(4,0);
+Ndef(\lfo, {LFTri.ar(1.2,mul:0.5, add:0.1)}).play(4, 0);
 )
 
 (
@@ -97,7 +60,7 @@ Ndef(\lfo, {LFTri.ar(30,mul:0.5, add:0.5)}).play(0,0);
 
 (
 Ndef(\p1).set(\freq, 1000, \detune,0.3, \f0,6.5, \f1,2.7, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1).play(0,2);
- Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
+Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
 Ndef(\roof).map(\x, Ndef(\lfo));
 Ndef(\lfo, {LFTri.ar(30,mul:0.5, add:0.5)}).play(0,4);
 )
@@ -216,11 +179,11 @@ Ndef(\roof).play(0);
 Ndef(\test, {|in=0|
 	Compander.ar(LFPar.ar(), In.ar(~a2),
 		thresh: MouseX.kr(0.01,0.5),
-        slopeBelow: 30,
+		slopeBelow: 30,
 		slopeAbove:  1,
-        clampTime:   0.01,
-        relaxTime:   0.01
-    )
+		clampTime:   0.01,
+		relaxTime:   0.01
+	)
 }).play;
 
 )
