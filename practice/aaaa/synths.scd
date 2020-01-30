@@ -92,7 +92,7 @@ Ndef(\roof).map(\x, Ndef(\lfo));
 Ndef(\p1).set(\freq, 4000, \detune,0.3, \f0,6.5, \f1,2.7, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1).play(0,2);
 Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
 Ndef(\roof).map(\x, Ndef(\lfo));
-Ndef(\lfo, {LFTri.ar(30,mul:0.5, add:0.5)}).play(0,0);
+Ndef(\lfo, {LFTri.ar(30,mul:0.5, add:0.5)}).play(0,2);
 )
 
 (
@@ -122,6 +122,8 @@ Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.9, \phasing,0, \l
 Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
 )
 
+
+////  ***
 (
 Ndef(\p1).set(\freq, 2000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.1, \phasing,0, \legato,0.1, \amp,0.1).play(0,2);
 Ndef(\roof).set(\x, 0.1, \y, 0.5, \amp, ~b1.asMap).play;
@@ -141,6 +143,7 @@ Ndef(\p1).set(\freq, 1000, \detune,0, \f0,6.5, \f1, 2.7, \w0, 0.5, \phasing,0, \
 Ndef(\roof).set(\x, 0.01, \y, 0.01, \amp, ~b1.asMap).play;
 )
 
+///// ****
 (
 Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.6, \phasing,0, \legato,0.1, \amp,0.2).play(0,2);
@@ -153,32 +156,35 @@ Ndef(\p1).set(\freq, 1000, \detune,0, \f0,6.5, \f1, 2.7, \w0, 0.6, \phasing,0, \
 Ndef(\roof).set(\x, 0.01, \y, 0.01, \amp, ~b1.asMap).play;
 )
 
-
+//// *****
 (
 Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.7, \phasing,0, \legato,0.1, \amp,0.2).play(0,2);
 Ndef(\roof).set(\x, 0.01, \y, 0.01, \amp, ~b1.asMap).play;
 )
 
+///// **
 (
 Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq,  4000, \detune,0, \f0,6.5, \f1, 3.7, \w0, 0.7, \phasing,0, \legato,0.01, \amp,0.15).play(0,2);
 Ndef(\roof).set(\x, 0.4, \y, 1, \amp, 0.4).play;
 )
 
+///// ******
 (
 Ndef(\lfo, {LFTri.ar(60,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.7, \phasing,0, \legato,0.1, \amp,0.2).play(0,2);
 Ndef(\roof).set(\x, 0.01, \y, 0.01, \amp, ~b1.asMap).play;
 )
 
+
 (
 Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq,  4000, \detune,0, \f0,6.5, \f1, 3.7, \w0, 0.7, \phasing,0, \legato,0.01, \amp,0.15).play(0,2);
 Ndef(\roof).set(\x, 0.4, \y, 1, \amp, 0.4).play;
 )
 
-
+// ***
 (
 Ndef(\lfo, {LFTri.ar(60,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.7, \phasing,0, \legato,0.1, \amp,0.2).play(0,2);

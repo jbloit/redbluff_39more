@@ -11,6 +11,7 @@
 ~o3 = Bus.audio(s, 1);
 ~o4 = Bus.audio(s, 1);
 ~o5 = Bus.audio(s, 1);
+~o6 = Bus.audio(s, 1);
 
 Ndef(\mix, {
 	Splay.ar(
@@ -20,13 +21,14 @@ Ndef(\mix, {
 			In.ar(~o3.index),
 			In.ar(~o4.index),
 			In.ar(~o5.index),
+			In.ar(~o6.index),
 	], 0.6);
 });
 
 // PULSE
 SynthDef(\p1, {|freq=4000, detune=0.3, f0=6.5, f1=2.7, w0=0.98, phasing=0, legato=0.5, amp=0.1 , out=0|
 	var sig, env, env2, trig, sig2, rel;
-	trig = Pulse.ar(f0, w0);
+	trig =Pulse.ar(f0, w0);
 	Out.kr(~k1, Amplitude.kr(trig));
 	rel = SinOsc.ar(f1, 0, 1, legato);
 	env = EnvGen.ar(Env.adsr(releaseTime:rel), trig);
@@ -42,7 +44,19 @@ SynthDef(\kick, {|out=0, amp=1|
 	sig = LFPar.ar(envFreq, mul:env) * amp;
 	Out.kr(~k2, env);
 	Out.ar(~a1, sig);
-	Out.ar(out, Splay.ar(sig));
+	Out.ar(out, sig);
+}).add;
+
+
+SynthDef(\noise, {|freq=100, out=0|
+	var mod, sig, sig2, env;
+	env = EnvGen.kr(Env.perc(0.001, 0.1), doneAction:2);
+	mod = SinOsc.ar(0.1, mul:300);
+	sig = PinkNoise.ar(0.5);
+	sig = HPF.ar(sig, freq:800 + mod);
+	freq = 	(freq  + mod).clip(1, 10000);
+	sig2 = BPF.ar(sig, freq: freq);
+	Out.ar(out, sig2!2);
 }).add;
 
 
@@ -68,20 +82,10 @@ SynthDef(\lo, {|freq = 40, amp=0.1, modBus, out=0, modLag=0, modMul = 1|
 	// modulate the frequency
 	mod = In.kr(modBus, 1).linlin(0, 1, freq, freq + ((freq / 2 )* modMul) );
 	mod = mod.lag(modLag);
-	sig = LFTri.ar(mod, mul:amp );
+	sig = LFTri.ar(mod, mul:amp, add:0.5 );
 	Out.ar(out, sig);
 }).add;
 
-SynthDef(\noise, {|freq=100, out=0, gate=1|
-	var mod, sig, sig2, env;
-	env = EnvGen.kr(Env.perc(), doneAction:2, gate:gate);
-	mod = SinOsc.ar(0.1, mul:300);
-	sig = PinkNoise.ar(0.5);
-	sig = HPF.ar(sig, freq:800 + mod);
-	freq = 	(freq  + mod).clip(1, 10000);
-	sig2 = BPF.ar(sig, freq: freq);
-	Out.ar(out, [sig, sig2]);
-}).add;
 
 // Synth(\noise, [\gate , 1])
 
