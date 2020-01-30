@@ -1,5 +1,13 @@
+MIDIClient.init;
+MIDIIn.connectAll;
+s.latency = 0.01;
+MIDIFunc.trace;
+//  to turn tracing off:
+// MIDIFunc.trace( false );
 
 (
+
+
 
 SynthDef(\kick, {|out=0, amp=1|
 	var sig, envFreq, env;
@@ -24,11 +32,22 @@ SynthDef(\noise, {|freq=100, out=0|
 
 MIDIdef.noteOn(\noteOnPad, {
 	|vel, nn, chan |
-	switch(chan,
-		0, {
+
+	if(nn<60,
+		{
 			Synth( \kick, [\out, 0]);
 			Synth( \kick, [\out, 1]);
-			},
+		},
+	{
+			Synth(\noise, [\freq, nn.linexp(60, 80, 500, 20000)]);
+		}
+	);
+
+
+	switch(chan,
+		0, {
+
+		},
 		1, {Synth(\noise, [\freq, 1000])},
 		2, {"2".postln;},
 		3, {"3".postln;},
