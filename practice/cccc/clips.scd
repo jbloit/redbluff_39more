@@ -8,216 +8,87 @@ Ndef(\mix).play;
 TempoClock.tempo = 1;
 
 
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([1, 1, 1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
 TempoClock.sched(1, {
-	~p1 = Synth(\p1).set(\freq, 4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
+	~p1 = Synth(\p1).set(\freq, 4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.2, \out, ~o2);
 });
 
 ~lo = Synth(\lo, [\freq,  30, \amp, 0.8,  \modBus, ~k2, \modMul, 0,  \modLag, 1.5, \out, ~o3 ]);
-~roof = Synth(\roof, [\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0]);
-
+~roof = Synth(\roof, [\x, 0.1, \y, 0.5, \amp, 0,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0]);
 ~disto = Synth(\disto, [\amp, 0.1 , \smooth, 1, \mul, 0.4, \freq,  0.2 , \filterFreq, 1000,  \rezFreq, 400 , \in, ~o1 , \out, ~o7]);
+
+
+MIDIdef.noteOn(\noteOnPad, {
+	|vel, nn, chan |
+
+
+	nn.postln;
+	if(nn<60,
+		{
+			Synth( \kick, [\out, ~o1]);
+			~lo.set(\amp, 0.8, \freq, nn.linlin(30, 60, 20, 40));
+		},
+		{
+			Synth(\noise, [\freq, nn.linexp(60, 80, 500, 20000), \out, ~o6]);
+			if(nn> 66, {~lo.set(\amp, 0);}, {	~lo.set(\amp, 0.8);});
+		}
+	);
+});
+
+~disto.set(\amp, 1, \in, ~o1, \mul, 0.2, \smooth, 0.7, \freq, 0.2, \filterFreq, 900, \rezFreq, 1900);
 
 
 )
 
-~disto.set(\amp, 1)
-~disto.set(\in, ~o1)
-~disto.set(\in, ~o2)
-~disto.set(\in, ~o3)
-~disto.set(\in, ~o5)
-~disto.set(\in, ~o1)
-~disto.set(\smooth, 0.5)
-~disto.set(\smooth, 0.7)
-~disto.set(\smooth, 0.9)
-~disto.set(\mul, 0.14)
-~disto.set(\freq, 0.2)
-~disto.set(\freq, 30)
-~disto.set(\filterFreq, 900)
-~disto.set(\rezFreq, 1900)
-~disto.set(\rezFreq, 4000)
-~disto.set(\rezFreq, 100)
-
 ///////////////////////////////////////////////////// 2
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([1, 1,1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
-
-});
-
+~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
 ~lo .set(\freq,  30, \amp, 2,  \modBus, ~k2, \modMul, 1,  \modLag, 1.5, \out, ~o3 );
 ~roof.set(\x, 0.8, \y, 0.5, \amp, 1,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 )
 
 ///////////////////////////////////////////////////// 3
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([1, 1,1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
 
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
-	~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
-	~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
+~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1, \out, ~o2);
+~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
+~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 
 )
 
 ///////////////////////////////////////////////////// 7
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([1, 1,1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
-Pdef(\snare,
-	Pbind(\instrument, \noise,
-		\out, ~o6.index,
-		\freq, Pseq([0, 1000, 3000], inf),
-		\dur, Pseq([1.6, 0.3, 0.1], inf),
-		\isRest, Pseq([0, 1,1], inf).coin.not,
-		\amp, Pseq([1], inf),
-	)
-).play(quant:1);
-
-
-TempoClock.sched(1, {
-	~p1.set(\freq,1000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.2, \out, ~o2);
-	~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
-	~roof.set(\x, 0.01, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
+~p1.set(\freq,1000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.2, \out, ~o2);
+~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
+~roof.set(\x, 0.01, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 
 )
 ///////////////////////////////////////////////////// 8
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([0.3, 0.7, 1]/2, inf),
-		\isRest, Pseq([1, 1,1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
 
-Pdef(\snare,
-	Pbind(\instrument, \noise,
-		\out, ~o6.index,
-		\freq, Pseq([1000, 3000], inf),
-		\dur, Pseq([0, 1], inf),
-		\isRest, Pseq([0, 1,1], inf).coin.not,
-		\amp, Pseq([1], inf),
-	)
-).play(quant:1);
-
-
-TempoClock.sched(1, {
-	~p1.set(\freq,1000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.2, \out, ~o2);
-	~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
-	~roof.set(\x, 0.01, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
-
+~p1.set(\freq,1000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.2, \out, ~o2);
+~lo .set(\freq,  35, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 0.5, \out, ~o3 );
+~roof.set(\x, 0.01, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 )
 
 ///////////////////////////////////////////////////// 4
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([1, 1,1, 1, 1, 1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
-	~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 1.5, \out, ~o3 );
-	~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
-
+~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
+~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 1,  \modLag, 1.5, \out, ~o3 );
+~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 )
-
-Pdef(\snare).stop
 
 ///////////////////////////////////////////////////// 5
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1, 1/4, 1/8], inf),
-		\isRest, Pseq([1, 1, 0, 1, 1, 0, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
-	~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 0.4,  \modLag, 0.5, \out, ~o3 );
-	~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
+~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
+~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 0.4,  \modLag, 0.5, \out, ~o3 );
+~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 )
 
 ///////////////////////////////////////////////////// 6
 (
-Pdef(\kick,
-	Pbind(\instrument, \kick,
-		\out, ~o1.index,
-		\dur, Pseq([1/2], inf),
-		\isRest, Pseq([1, 1, 1], inf).coin.not,
-		\amp, Pseq([0.8], inf),
-	)
-).play(quant:1);
-
-Pdef(\snare,
-	Pbind(\instrument, \noise,
-		\out, ~o6.index,
-		\freq, 1000,
-		\dur, Pseq([1], inf),
-		\isRest, Pseq([0, 1], inf).coin.not,
-		\amp, Pseq([1], inf),
-	)
-).play(quant:1);
-
-
-
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
-	~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 0.4,  \modLag, 0.5, \out, ~o3 );
-	~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
-
-});
-
+~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.1, \amp,0.1, \out, ~o2);
+~lo .set(\freq,  40, \amp, 0.8,  \modBus, ~k2, \modMul, 0.4,  \modLag, 0.5, \out, ~o3 );
+~roof.set(\x, 0.1, \y, 0.5, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 )
 
 
@@ -226,27 +97,7 @@ TempoClock.sched(1, {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-)
-
-TempoClock.sched(1, {
-	~p1.set(\freq,4000, \detune,0, \f0,8, \f1,2, \w0,0.99, \phasing,0, \legato,0.01, \amp,0.2, \out, ~o2);
-	~lo .set(\freq,  30, \amp, 0.8,  \modBus, ~k2, \modMul, 0.4,  \modLag, 0, \out, ~o3 );
-	~roof.set(\x, 0.01, \y, 0.01, \amp, 2,  \out, ~o4, \modBus, ~k1, \modMul, 1, \modLag, 0);
-});
-
-
-()
+(
 Ndef(\lfo, {LFTri.ar(30,mul:0.9, add:0.5)}).play(0,4);
 Ndef(\p1).set(\freq, 4000, \detune,0, \f0,6.5, \f1,2.7, \w0, 0.7, \phasing,0, \legato,0.1, \amp,0.2).play(0,2);
 Ndef(\roof).set(\x, 0.01, \y, 0.01, \amp, ~b1.asMap).play;

@@ -1,4 +1,11 @@
+
+
 (
+
+// MIDIClient.init;
+// MIDIIn.connectAll;
+
+
 
 ~k1 = Bus.control(s, 1);
 ~k2 = Bus.control(s, 1);
@@ -114,4 +121,3 @@ SynthDef(\disto,{| amp=0.1,smooth=1,mul=0.4,freq=0.2, filterFreq=1000, rezFreq=4
 // Synth(\noise, [\gate , 1])
 
 )
-
