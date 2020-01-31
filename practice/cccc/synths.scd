@@ -1,11 +1,7 @@
-
+MIDIClient.init;
+MIDIIn.connectAll;
 
 (
-
-// MIDIClient.init;
-// MIDIIn.connectAll;
-
-
 
 ~k1 = Bus.control(s, 1);
 ~k2 = Bus.control(s, 1);
