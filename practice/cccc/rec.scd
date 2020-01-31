@@ -3,7 +3,7 @@
 
 ~title = "rake-cccc_";
 ~timeStamp = Date.getDate.stamp;
-~clipName = "clip-8_";
+~clipName = "clip-11_";
 ~clipsPrefix = thisProcess.platform.recordingsDir++"/"++~title++~clipName++~timeStamp;
 
 

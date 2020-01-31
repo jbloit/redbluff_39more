@@ -62,7 +62,7 @@ SynthDef(\noise, {|freq=100, out=0|
 	sig = HPF.ar(sig, freq:800 + mod);
 	freq = 	(freq  + mod).clip(1, 10000);
 	sig2 = BPF.ar(sig, freq: freq);
-	Out.ar(out, sig2!2);
+	Out.ar(out, sig2);
 }).add;
 
 
