@@ -3,7 +3,7 @@
 
 ~title = "rake-cccc_";
 ~timeStamp = Date.getDate.stamp;
-~clipName = "clip-11_";
+~clipName = "clip-09_";
 ~clipsPrefix = thisProcess.platform.recordingsDir++"/"++~title++~clipName++~timeStamp;
 
 
@@ -32,7 +32,7 @@
 
 
 (
-~recDur = 8;
+~recDur = 16;
 TempoClock.sched(TempoClock.timeToNextBeat(quant:1),
 	{
 		~rec1.record(bus:~o1, duration:~recDur);
