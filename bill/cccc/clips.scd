@@ -61,6 +61,8 @@ MIDIdef.noteOn(\noteOnPad, {
 ~lo .set(\freq,  30, \amp, 2,  \modBus, ~k2, \modMul, 1,  \modLag, 1.5, \out, ~o3 );
 ~roof.set(\x, 0.8, \y, 0.5, \amp, 1,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 
+~disto.set(\amp, 1, \in, ~o2, \mul, 0.2, \smooth, 0.6, \freq, 20, \filterFreq, 1000, \rezFreq, 2000);
+
 
 MIDIdef.noteOn(\noteOnPad, {
 	|vel, nn, chan |
