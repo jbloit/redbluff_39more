@@ -10,11 +10,13 @@ MIDIFunc.trace(false);
 
 
 (
-~playCue = {|val|
+~playCue = {|footNote|
 	// "PLAY CUE".postln;
 	// val.postln;
 
-	if(val < 6, {
+
+	// Bottom row in step controller
+	if(footNote < 6, {
 
 		"//////////////////// preset 1".postln;
 
@@ -46,8 +48,51 @@ MIDIFunc.trace(false);
 				}
 			);
 		}, chan:0);
+
+		switch(footNote,
+			1, {
+				"cue 1".postln;
+				~roof.set(\amp, 0);
+				~lo.set(\amp, 0);
+				~p1.set(\amp, 0);
+			},
+			2, {
+				"cue 2".postln;
+
+				~roof.set(\amp, 1);
+				~lo.set(\amp, 0);
+				~p1.set(\amp, 0);
+
+			},
+			3, {
+				"cue 3".postln;
+				~roof.set(\amp, 0);
+				~lo.set(\amp, 1);
+				~p1.set(\amp, 0);
+
+			},
+
+			4, {
+				"cue4".postln;
+				~roof.set(\amp,1);
+				~lo.set(\amp, 0);
+				~p1.set(\amp, 1);
+
+			},
+			5, {
+				"cue 5".postln;
+				~roof.set(\amp, 1);
+				~lo.set(\amp, 1);
+				~p1.set(\amp, 1);
+
+			},
+		)
+
 	},
 
+
+
+	// Top row on foot controller
 	{
 
 		"///////////////////////////////////// preset 2".postln;
@@ -96,6 +141,48 @@ MIDIFunc.trace(false);
 			);
 		}, chan:0);
 
+
+				switch(footNote,
+			6, {
+				"cue 6".postln;
+				~roof.set(\amp, 0);
+				~lo.set(\amp, 0);
+				~p1.set(\amp, 1);
+			},
+			7, {
+				"cue 7".postln;
+
+				~roof.set(\amp, 1);
+				~lo.set(\amp, 1);
+				~p1.set(\amp, 0);
+
+			},
+			8, {
+				"cue 8".postln;
+				~roof.set(\amp, 0);
+				~lo.set(\amp, 1);
+				~p1.set(\amp, 1);
+
+			},
+
+			9, {
+				"cue9".postln;
+				~roof.set(\amp, 1);
+				~lo.set(\amp, 0);
+				~p1.set(\amp, 1);
+
+			},
+			10, {
+				"cue 10".postln;
+				~roof.set(\amp, 1);
+				~lo.set(\amp, 1);
+				~p1.set(\amp, 1);
+
+			},
+		)
+
+
+
 	}
 	);
 
@@ -110,10 +197,10 @@ MIDIdef.noteOn(\cues, {|vel, nn|
 	if(nn!=~curCue, {
 		~curCue = nn;
 
-		~playCue.value(nn);
 
 		"-------------------------- CUE CHANGE".postln;
-		nn.postln;
+		~playCue.value(nn);
+
 		"--------------------------".postln;
 
 	});
