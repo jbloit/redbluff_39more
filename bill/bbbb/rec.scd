@@ -23,7 +23,7 @@
 
 
 (
-~recDur = 8;
+~recDur = 24;
 TempoClock.sched(TempoClock.timeToNextBeat(quant:1),
 	{
 		~rec1.record(bus:~o1, duration:~recDur);

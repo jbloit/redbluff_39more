@@ -27,7 +27,7 @@ MIDIFunc.trace(false);
 
 		~p1.set(\freq,4000, \detune,0.3, \f0,8, \f1,4, \w0,0.98, \phasing,0, \legato,0.5, \amp,0.1 * ~p1ON, \out, ~o2);
 
-		"a".postln;
+//		"a".postln;
 		~lo .set(\freq,  30, \amp, 2 * ~loON,  \modBus, ~k2, \modMul, 1,  \modLag, 1.5, \out, ~o3 );
 		~roof.set(\x, 0.8, \y, 0.5, \amp, 1*~roofON,  \out, ~o4, \modBus, ~k1, \modMul, 0, \modLag, 0);
 
@@ -36,7 +36,7 @@ MIDIFunc.trace(false);
 			|vel, nn, chan |
 
 
-			nn.postln;
+//			nn.postln;
 			if(nn<60,
 				{
 					Synth( \kick, [\out, ~o1]);
@@ -81,7 +81,7 @@ MIDIFunc.trace(false);
 
 				~roofON = 0;
 				~loON =1;
-				~p1ON = 0;
+				~p1ON = 1;
 				~roof.set(\amp, ~roofON);
 				~lo.set(\amp, ~loON);
 				~p1.set(\amp, ~p1ON);
@@ -129,7 +129,7 @@ MIDIFunc.trace(false);
 		MIDIdef.noteOn(\noteOnPad, {
 			|vel, nn, chan |
 
-			nn.postln;
+//			nn.postln;
 			if(nn<60,
 				{
 					// kick bass
@@ -276,7 +276,7 @@ MIDIdef.noteOn(\noteOnPad, {
 	|vel, nn, chan |
 
 
-	nn.postln;
+//	nn.postln;
 	if(nn<60,
 		{
 			Synth( \kick, [\out, ~o1]);
