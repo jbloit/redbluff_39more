@@ -121,6 +121,7 @@ MIDIdef.freeAll;
 ~noiseOn=False;
 ~noiseFreq = 1000;
 ~noiseFreqInc = 400;
+~allCount=0;
 ~hatCount=0;
 )
 
@@ -137,7 +138,6 @@ MIDIdef.program(\section, {|val|
 		{switch(val,
 
 			1,{">>>>>>>>>>>>SECTION 1".postln
-
 				(
 
 					~pitch.set(\val, 0.1);
@@ -148,11 +148,21 @@ MIDIdef.program(\section, {|val|
 					~in1.set(\out, 1);
 					~in2.set(\out, 2);
 					~in3.set(\out, 3);
+					~allCount = -1;
+
+					~click = {|count|
+						~allCount = ~allCount + 1;
+						if (~allCount % 4 == 0, {"CLICK".postln;
+							Synth(\beep, [\out, ~distoBus, \freq, 2000, \rel, 1]);
+						});
+					};
+
 
 
 					MIDIdef.noteOn(\kick, {|val|
 						// val.postln;
 						if(val>0,{
+							~click.value();
 							~decay.set(\val, 0.4);
 							if(~noiseOn==True,{~noise.free; ~noiseOn=False}, {});
 						});
@@ -162,6 +172,7 @@ MIDIdef.program(\section, {|val|
 					MIDIdef.noteOn(\snare, {|val|
 						// val.postln;
 						if(val>0,{
+							~click.value();
 							~pitch.set(\val, 0.05);
 							~decay.set(\val, 0.0);
 							if(~noiseOn==True, {}, {
@@ -176,6 +187,7 @@ MIDIdef.program(\section, {|val|
 					MIDIdef.noteOn(\hat, {|val|
 						// val.postln;
 						if(val>0,{
+							~click.value();
 							~hatCount = ~hatCount + 1;
 							~noise.set(\freq, ~noiseFreq + ~noiseFreqInc * ~hatCount);
 							~pitch.set(\val, 0.07);
@@ -230,7 +242,7 @@ MIDIdef.program(\section, {|val|
 							~decay.set(\val, 0.0);
 							if(~noiseOn==True, {}, {
 								~hatCount = 0;
-								~noise=Synth(\noise, [\out, ~distoBus]);
+								~noise=Synth(\noise);
 								~noiseOn = True;}
 							);
 						});

@@ -16,9 +16,17 @@ Ndef(\noise, {|out=0, freq=55, detune=0.3, f0=6, f1=2.7, w0=0.98, phasing=0, leg
 Ndef(\noise).stop
 Ndef(\noise).play
 
-
-Ndef(\noise).set(\freq, 60, \legato, 0.1, \f1, 2.7)
+Ndef(\noise).set(\freq, 10, \legato, 0.1, \f1, 2.7)
 Ndef(\noise).set(\freq, 63, \legato, 0.9, \f1, 2)
 Ndef(\noise).set(\freq, 60, \legato, 0.1, \f1, 2.7)
 Ndef(\noise).set(\freq, 63, \legato, 0.9, \f1, 2)
 Ndef(\noise).set(\phasing, 1)
+
+Ndef(\noise).set(\freq, 4000, \legato, 0.1, \f0, 8,\f1, 2.7, \phasing, 9);
+Ndef(\noise).set(\freq, 4000, \legato, 0.1, \f0, 8,\f1, 3.7, \phasing, 1);
+Ndef(\noise).set(\freq, 4000, \legato, 0.1, \f0, 8,\f1, 4.7, \phasing, 1);
+
+Ndef(\noise).set(\freq, 10030, \legato, 0.01, \f0, 8,\f1, 0.5, \phasing, 1);
+Ndef(\noise).set(\freq, 200, \legato, 0.1, \f0, 8,\f1, 0.9, \detune, 0.9);
+Ndef(\noise).set(\freq, 100, \legato, 0.1, \f0, 8,\f1, 1.9, \detune, 0.9);
+

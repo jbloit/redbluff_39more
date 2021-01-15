@@ -35,23 +35,13 @@ FX in =  ~fxBus;
 
 */
 
-s.latency = 0.1;
-s.reboot;
-
 
 ///////////////////////////////////////////////////////////////////////////// INIT SAMPLER FOR MOCKUP
 (
 
-MIDIClient.init;
-s.latency = 0.1;
-m = MIDIOut(1).latency = 0.1;
-
 t = TempoClock.tempo = 60/60;
 
-~fxBus0 = Bus.audio(s, 1);
-~fxBus1 = Bus.audio(s, 1);
-~fxBus2 = Bus.audio(s, 1);
-
+~fxBus = Bus.audio(s, 2);
 
 ~samplesDir = thisProcess.nowExecutingPath.dirname +/+"RedBluffAcousticDrums";
 
@@ -64,10 +54,9 @@ SynthDef(\sampler, {
 	sig = sig * env;
 	sigfilt = BPF.ar(sig, timbre.clip(0,1).linexp(0, 1, 100, 10000), 0.3);
 	sig = Mix.ar([sig*0.5, sigfilt*0.9]);
-	// sig = Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0));
-
+	sig = Pan2.ar(sig*amp, pan.linlin(0.0, 1.0, -1.0, 1.0));
 	Out.ar(out, sig);
-
+	Out.ar(~fxBus, sig);
 }).add;
 
 
@@ -82,8 +71,8 @@ SynthDef(\bass, {|freq=200, amp=0.1, gate=1, out=0|
 }).add;
 
 
-SynthDef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2, out=0, in=0;
-	var sig = In.ar(in,1);
+SynthDef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2, out=0;
+	var sig = In.ar(~fxBus.index,2);
 	sig = CrossoverDistortion.ar(sig,amp,SinOsc.ar([freq,freq+0.5],0,0.1,smooth),mul);
 	//sig = FreeVerb.ar(sig,0.5,0.5);
 	sig = sig + CombC.ar(sig,0.1,1/8,0.1);
@@ -91,12 +80,17 @@ SynthDef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2, out=0, in=0;
 	//sig = SineShaper.ar(sig, 1,0.5);
 	sig = BRF.ar(sig,432,15,-10);
 	sig = HPF.ar(sig,432/2);
-	//	sig = Limiter.ar(sig,0.5);
+//	sig = Limiter.ar(sig,0.5);
 	sig = LeakDC.ar(sig);
-	//	sig = Compander.ar(sig,In.ar(4,2),0.1,1,0.25,0.1,0.01);
+//	sig = Compander.ar(sig,In.ar(4,2),0.1,1,0.25,0.1,0.01);
 	sig = [DelayL.ar(sig*(-1),0.1,SinOsc.kr(-0.1,0,0.05,0.1)),DelayL.ar(sig*(-1),0.1,SinOsc.kr(0.1,0,0.05,0.1))]*0.1;
 	Out.ar(out, sig);
 }).add;
+
+
+
+
+// Ndef(\fx).stop;
 
 
 // LOAD SAMPLES
@@ -125,18 +119,13 @@ SynthDef(\cross,{arg amp=0.5,smooth=0.3,mul=1,freq=0.2, out=0, in=0;
 
 
 
-/////////////////////////////////s///////// 3 layers riffs for wenzhu
+
+
+////////////////////////////////////////// 3 layers riffs for wenzhu
 
 
 
 (
-Pdef(\p2s4).stop;
-Pdef(\p1s2).play;
-)
-
-
-(
-
 
 //////////////// 1
 
@@ -149,21 +138,7 @@ Pdef(\p1s1, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -171,8 +146,7 @@ Pdef(\p1s1, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 0,
-			\out, 1,
+			\amp, 0;
 		),
 
 		//hat
@@ -181,10 +155,8 @@ Pdef(\p1s1, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7], inf),
-			\amp, 1,
-			\out, 2
-		),
-
+			\amp, 1;
+		)
 	]
 ));
 
@@ -199,20 +171,7 @@ Pdef(\p1s2, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -220,8 +179,7 @@ Pdef(\p1s2, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -230,12 +188,12 @@ Pdef(\p1s2, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
 );
+
 
 
 ////////////////////////////////// 3
@@ -248,20 +206,7 @@ Pdef(\p1s3, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -269,8 +214,7 @@ Pdef(\p1s3, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -279,8 +223,7 @@ Pdef(\p1s3, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -298,20 +241,7 @@ Pdef(\p1s4, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 3/4, 3/4, 9/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -319,8 +249,7 @@ Pdef(\p1s4, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -329,8 +258,7 @@ Pdef(\p1s4, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7,6,7,6,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -346,28 +274,15 @@ Pdef(\p1s5, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 3/4, 3/4, 1/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(5/4),11/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -376,8 +291,7 @@ Pdef(\p1s5, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -394,21 +308,7 @@ Pdef(\p1s6, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur, Pseq([3/4, 6/4, 7/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -416,8 +316,7 @@ Pdef(\p1s6, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -426,8 +325,7 @@ Pdef(\p1s6, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -444,20 +342,7 @@ Pdef(\p1s7, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 6/4, 7/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -465,8 +350,7 @@ Pdef(\p1s7, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -475,8 +359,7 @@ Pdef(\p1s7, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -492,20 +375,7 @@ Pdef(\p1s8, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur, Pseq([3/4, 1/4, 5/4, 7/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -513,8 +383,7 @@ Pdef(\p1s8, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -523,8 +392,7 @@ Pdef(\p1s8, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -540,20 +408,7 @@ Pdef(\p1s9, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 1/4, 5/4, 1/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -561,8 +416,7 @@ Pdef(\p1s9, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -571,9 +425,8 @@ Pdef(\p1s9, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6], inf),
-			\amp, 1,
-			\out, 2,
-		)
+			\amp, 1;
+s		)
 	]
 ));
 );
@@ -589,28 +442,15 @@ Pdef(\p1s10, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 1/4, 5/4, Rest(1/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(5/4),2/4,2/4, 1/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -619,8 +459,7 @@ Pdef(\p1s10, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -636,28 +475,15 @@ Pdef(\p1s11, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, 1/4, 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -666,8 +492,7 @@ Pdef(\p1s11, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		)
 	]
 ));
@@ -675,7 +500,7 @@ Pdef(\p1s11, Ppar(
 
 ////////////////////////////////// 12
 (
-Pdef(\p1s12, Ppar(
+ Pdef(\p1s12, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -683,28 +508,15 @@ Pdef(\p1s12, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,   Pseq([3/4, 1/4, 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -713,8 +525,7 @@ Pdef(\p1s12, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 0,
-			\out, 2,
+			\amp, 0;
 		)
 	]
 ));
@@ -725,7 +536,7 @@ Pdef(\p1s12, Ppar(
 
 ////////////////////////////////// 13
 (
-Pdef(\p1s13, Ppar(
+ Pdef(\p1s13, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -733,20 +544,7 @@ Pdef(\p1s13, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -754,8 +552,7 @@ Pdef(\p1s13, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -764,8 +561,7 @@ Pdef(\p1s13, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 0,
-			\out, 2,
+			\amp, 0;
 		)
 	]
 ));
@@ -775,7 +571,7 @@ Pdef(\p1s13, Ppar(
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 1
 (
-Pdef(\p2s1, Ppar(
+ Pdef(\p2s1, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -783,20 +579,7 @@ Pdef(\p2s1, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,   Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -804,8 +587,7 @@ Pdef(\p2s1, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 3,
-			\out, 1,
+			\amp, 3;
 		),
 
 		//hat
@@ -814,16 +596,15 @@ Pdef(\p2s1, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 0,
-			\out, 2,
+			\amp, 0;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, 50,
-		\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-		\legato, 0.4,
-		\amp, 1,
-		)*/
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, 0.4,
+			\amp, 1,
+		)
 	]
 ));
 );
@@ -832,7 +613,7 @@ Pdef(\p2s1, Ppar(
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 2
 (
-Pdef(\p2s2, Ppar(
+ Pdef(\p2s2, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -840,28 +621,15 @@ Pdef(\p2s2, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(5/4),2/4,2/4, 3/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 3,
-			\amp, 0,
-			\out, 1,
+			\amp, 0;
 		),
 
 		//hat
@@ -870,16 +638,15 @@ Pdef(\p2s2, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6,7,8,7,6,7], inf),
-			\amp, 0,
-			\out, 2,
+			\amp, 0;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, 50,
-		\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
@@ -890,61 +657,6 @@ Pdef(\p2s2, Ppar(
 ////////////////////////////////// 3
 (
 // Pdef(\p2s3, Ppar(
-[
-	// kick
-	Pbind(\instrument, \sampler,
-		\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-		\pan, 1,
-		\timbre, 0,
-		\bufnum, 0,
-		\amp, 3,
-		\out, 0,
-	),
-	// kick midi
-	Pbind(
-		\type, \midi,
-		\midicmd, \noteOn,
-		\midiout, m,
-		\chan, 0,
-		//The rest of the pattern
-		\midinote, 0,
-		\dur,   Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-		\legato, 0.1,
-	),
-	// snare
-	Pbind(\instrument, \sampler,
-		\dur, Pseq([Rest(3/4), 3/4], inf),
-		\pan, 0,
-		\timbre, 0,
-		\bufnum, 4,
-		\amp, 1,
-		\out, 1,
-	),
-
-	//hat
-	Pbind(\instrument, \sampler,
-		\dur, Pseq([3/4]/2, inf),
-		\pan, 0.5,
-		\timbre, 0,
-		\bufnum, Pseq([6], inf),
-		\amp, 1,
-		\out, 2,
-	),
-	/*	// bass
-	PmonoArtic(\bass,
-	\freq, 50,
-	\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-	\legato, Pseq([0.5, 0.1], inf),
-	\amp, 1,
-	)*/
-]
-));
-);
-
-////////////////////////////////////////////// 2
-////////////////////////////////// 4
-(
-Pdef(\p2s4, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -952,28 +664,56 @@ Pdef(\p2s4, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,  Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(3/4), 3/4], inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 4,
+			\amp, 1;
+		),
+
+		//hat
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4]/2, inf),
+			\pan, 0.5,
+			\timbre, 0,
+			\bufnum, Pseq([6], inf),
+			\amp, 1;
+		),
+		// bass
+		PmonoArtic(\bass,
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
 			\amp, 1,
-			\out, 1,
+		)
+	]
+));
+);
+
+////////////////////////////////////////////// 2
+////////////////////////////////// 4
+(
+ Pdef(\p2s4, Ppar(
+	[
+		// kick
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\pan, 1,
+			\timbre, 0,
+			\bufnum, 0,
+			\amp, 3),
+
+		// snare
+		Pbind(\instrument, \sampler,
+			\dur, Pseq([Rest(3/4), 3/4], inf),
+			\pan, 0,
+			\timbre, 0,
+			\bufnum, 4,
+			\amp, 1;
 		),
 
 		//hat
@@ -982,16 +722,15 @@ Pdef(\p2s4, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([6], inf),
-			\amp, 1,
-			\out, 2,
+			\amp, 1;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, 50,
-		\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, 50,
+			\dur, Pseq([3/4, Rest(1/4), 5/4, Rest(3/4)]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
@@ -999,7 +738,7 @@ Pdef(\p2s4, Ppar(
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 5
 (
-Pdef(\p2s5, Ppar(
+ Pdef(\p2s5, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -1007,28 +746,15 @@ Pdef(\p2s5, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
+
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/2, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 4,
-			\amp, 1,
-			\out, 1,
+			\amp, 1;
 		),
 
 		//hat
@@ -1037,16 +763,15 @@ Pdef(\p2s5, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([8, 6], inf),
-			\amp, 0.5,
-			\out, 2,
+			\amp, 0.5;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, 50,
-		\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, 50,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
@@ -1054,7 +779,7 @@ Pdef(\p2s5, Ppar(
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 6
 (
-Pdef(\p2s6, Ppar(
+ Pdef(\p2s6, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -1062,20 +787,7 @@ Pdef(\p2s6, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-			\legato, 0.1,
-		),
+			\amp, 3),
 
 		// snare
 		Pbind(\instrument, \sampler,
@@ -1083,8 +795,7 @@ Pdef(\p2s6, Ppar(
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 4,
-			\amp, 1,
-			\out, 1,
+			\amp, 1;
 		),
 
 		//hat
@@ -1093,16 +804,15 @@ Pdef(\p2s6, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([8, 6], inf),
-			\amp, 0.5,
-			\out, 2,
+			\amp, 0.5;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, 50,
-		\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, 50,
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
@@ -1110,7 +820,7 @@ Pdef(\p2s6, Ppar(
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 7
 (
-Pdef(\p2s7, Ppar(
+ Pdef(\p2s7, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -1118,29 +828,15 @@ Pdef(\p2s7, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
+			\amp, 3),
 
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,   Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-			\legato, 0.1,
-		),
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/4, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 4,
-			\amp, 1,
-			\out, 1,
+			\amp, 1;
 		),
 
 		//hat
@@ -1149,27 +845,25 @@ Pdef(\p2s7, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([8, 6], inf),
-			\amp, 0.5,
-			\out, 2,
+			\amp, 0.5;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, [50, 8000],
-		\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, [50, 8000],
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
-
 
 ////////////////////////////////////////////// 2
 ////////////////////////////////// 8
 // ADD DISTORSION HERE
 
 (
-Pdef(\p2s8, Ppar(
+ Pdef(\p2s8, Ppar(
 	[
 		// kick
 		Pbind(\instrument, \sampler,
@@ -1177,29 +871,15 @@ Pdef(\p2s8, Ppar(
 			\pan, 1,
 			\timbre, 0,
 			\bufnum, 0,
-			\amp, 3,
-			\out, 0,
-		),
+			\amp, 3),
 
-		// kick midi
-		Pbind(
-			\type, \midi,
-			\midicmd, \noteOn,
-			\midiout, m,
-			\chan, 0,
-			//The rest of the pattern
-			\midinote, 0,
-			\dur,   Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-			\legato, 0.1,
-		),
 		// snare
 		Pbind(\instrument, \sampler,
 			\dur, Pseq([Rest(2/4), 12/4,12/4, 12/4, 26/4]/4, inf),
 			\pan, 0,
 			\timbre, 0,
 			\bufnum, 4,
-			\amp, 1,
-			\out, 1,
+			\amp, 1;
 		),
 
 		//hat
@@ -1208,23 +888,27 @@ Pdef(\p2s8, Ppar(
 			\pan, 0.5,
 			\timbre, 0,
 			\bufnum, Pseq([8, 6], inf),
-			\amp, 0,
-			\out, 2,
+			\amp, 0;
 		),
-		/*		// bass
+		// bass
 		PmonoArtic(\bass,
-		\freq, [50, 8000],
-		\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
-		\legato, Pseq([0.5, 0.1], inf),
-		\amp, 1,
-		)*/
+			\freq, [50, 8000],
+			\dur, Pseq([6/4, 6/4, 6/4, 14/4]/2, inf),
+			\legato, Pseq([0.5, 0.1], inf),
+			\amp, 1,
+		)
 	]
 ));
 );
 
 
+d = Synth(\cross);
 
 
+(
+Pdef(\p2s9).stop;
+Pdef(\p2s10).play;
+)
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1236,48 +920,48 @@ Pdef(\p2s8, Ppar(
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4], 4),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, 0,
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4], 4),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, 0,
+	\amp, Prand([0.3, 2, 4], inf))).play;
 )
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play
+	\dur, Prand([1/4], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play
 )
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play
 )
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play
 )
 
 ////////////////// GROOVE A
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Ndef(\fx).set(\freq, 100);
 )
@@ -1285,30 +969,30 @@ Ndef(\fx).set(\freq, 100);
 /////////////// RUBATO IMPRO
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, 1/ Pseq([
-Pseries({ rrand(2, 7) }, 1, { rrand(4, 8) }),    // up (step = 1)
-Pseries({ rrand(3, 7) }, 1, { rrand(4, 8) }),    // up (step = 1)
-], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..6), inf),
-\amp, Prand([0.3, 2, 4], inf))).play
+	\dur, 1/ Pseq([
+		Pseries({ rrand(2, 7) }, 1, { rrand(4, 8) }),    // up (step = 1)
+		Pseries({ rrand(3, 7) }, 1, { rrand(4, 8) }),    // up (step = 1)
+	], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..6), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play
 )
 
 
 ////////// rand kick snare, pattern hat
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\hat, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
-\bufnum, Prand([1,2],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
+	\bufnum, Prand([1,2],inf),
+	\amp, 0.6,)).play;
 
 )
 
@@ -1316,16 +1000,16 @@ Pdef(\hat, Pbind(\instrument, \sampler,
 ////////// rand kick snare, pattern hat
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\hat, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2], inf)),
-\bufnum, Prand([1,2],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2], inf)),
+	\bufnum, Prand([1,2],inf),
+	\amp, 0.6,)).play;
 )
 
 
@@ -1333,32 +1017,32 @@ Pdef(\hat, Pbind(\instrument, \sampler,
 ////////// rand kick snare, pattern hat
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\hat, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2, 1/4, 1/8], inf)),
-\bufnum, Prand([6,7,8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2, 1/4, 1/8], inf)),
+	\bufnum, Prand([6,7,8],inf),
+	\amp, 0.6,)).play;
 )
 
 
 ////////// rand kick snare, pattern hat
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Pseq([1/4, 1/8, 1/8], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.9, 1.0, inf),
-\bufnum, Prand((1,2..3), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Pseq([1/4, 1/8, 1/8], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.9, 1.0, inf),
+	\bufnum, Prand((1,2..3), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\hat, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2, 1/4, 1/8], inf)),
-\bufnum, Prand([9, 10, 11],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2, 1/4, 1/8], inf)),
+	\bufnum, Prand([9, 10, 11],inf),
+	\amp, 0.6,)).play;
 )
 
 
@@ -1368,31 +1052,31 @@ Pdef(\hat, Pbind(\instrument, \sampler,
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/2], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((8, 9..11), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/2], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((8, 9..11), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\snare, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
-\bufnum, Prand([8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
+	\bufnum, Prand([8],inf),
+	\amp, 0.6,)).play;
 Ndef(\fx).set(\freq, 100);
 )
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8, 1/2], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand((3,4..6), inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8, 1/2], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand((3,4..6), inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\snare, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
-\bufnum, Prand([8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2,1/8,1/4], inf)),
+	\bufnum, Prand([8],inf),
+	\amp, 0.6,)).play;
 Ndef(\fx).set(\freq, 90);
 )
 
@@ -1400,16 +1084,16 @@ Ndef(\fx).set(\freq, 90);
 // rolllll hat
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8, 1/2], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand([5,10], inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8, 1/2], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand([5,10], inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\snare, Pbind(\instrument, \sampler,
-\dur, Pstutter(3, Pseq([1/2,1/8, 1/16], inf)),
-\bufnum, Prand([7,8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(3, Pseq([1/2,1/8, 1/16], inf)),
+	\bufnum, Prand([7,8],inf),
+	\amp, 0.6,)).play;
 Ndef(\fx).set(\freq, 90);
 )
 
@@ -1417,16 +1101,16 @@ Ndef(\fx).set(\freq, 90);
 // rollll groover
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8, 1/2], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand([5,10], inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8, 1/2], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand([5,10], inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\snare, Pbind(\instrument, \sampler,
-\dur, Pstutter(4, Pseq([1/8, 1/16], inf)),
-\bufnum, Prand([6, 7,8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(4, Pseq([1/8, 1/16], inf)),
+	\bufnum, Prand([6, 7,8],inf),
+	\amp, 0.6,)).play;
 Ndef(\fx).set(\freq, 90);
 )
 
@@ -1434,16 +1118,16 @@ Ndef(\fx).set(\freq, 90);
 // rollll groover,
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4, 1/8, 1/2], inf),
-\pan, Prand([0,1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, Prand([5,10], inf),
-\amp, Prand([0.3, 2, 4], inf))).play;
+	\dur, Prand([1/4, 1/8, 1/2], inf),
+	\pan, Prand([0,1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, Prand([5,10], inf),
+	\amp, Prand([0.3, 2, 4], inf))).play;
 
 Pdef(\snare, Pbind(\instrument, \sampler,
-\dur, Pstutter(4, Pseq([1/8, 1/16], inf)),
-\bufnum, Prand([6, 7,8],inf),
-\amp, 0.6,)).play;
+	\dur, Pstutter(4, Pseq([1/8, 1/16], inf)),
+	\bufnum, Prand([6, 7,8],inf),
+	\amp, 0.6,)).play;
 Ndef(\fx).set(\freq, 90);
 )
 
@@ -1451,11 +1135,11 @@ Ndef(\fx).set(\freq, 90);
 Pdef(\kick).stop;
 (
 Pdef(\kick1, Pbind(\instrument, \sampler,
-\dur, Prand([1/4], inf),
-\pan, Prand([0, 1, 0.5], inf),
-\timbre, Pwhite(0.0, 1.0, inf),
-\bufnum, 1,
-\amp, Prand([0.3, 2, 4], inf))).play
+	\dur, Prand([1/4], inf),
+	\pan, Prand([0, 1, 0.5], inf),
+	\timbre, Pwhite(0.0, 1.0, inf),
+	\bufnum, 1,
+	\amp, Prand([0.3, 2, 4], inf))).play
 )
 
 
@@ -1465,11 +1149,11 @@ Pdef(\snare).stop;
 
 (
 Pdef(\kick, Pbind(\instrument, \sampler,
-\dur, Prand([1/4], inf),
-\pan, Prand([0.5,0.5, 0.5], inf),
-\timbre, Pwhite(1.0, 1.0, inf),
-\bufnum, Prand([4], inf),
-\amp, Prand([0.3], inf))).play;
+	\dur, Prand([1/4], inf),
+	\pan, Prand([0.5,0.5, 0.5], inf),
+	\timbre, Pwhite(1.0, 1.0, inf),
+	\bufnum, Prand([4], inf),
+	\amp, Prand([0.3], inf))).play;
 )
 
 */
